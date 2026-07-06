@@ -1,0 +1,366 @@
+<!DOCTYPE html><html class="light bg-white" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Gestión de Grados Académicos | AcademiaPro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "inverse-on-surface": "#9c98c6",
+                "tertiary-container": "#fc92e0",
+                "secondary-container": "#d3ccff",
+                "outline": "#75729e",
+                "primary-fixed-dim": "#768aff",
+                "secondary-dim": "#4d3dae",
+                "surface-container-low": "#f1f5f9",
+                "on-secondary-container": "#4433a5",
+                "background": "#f8fafc",
+                "error-dim": "#a70138",
+                "secondary-fixed": "#d3ccff",
+                "primary-fixed": "#8899ff",
+                "on-primary-fixed": "#000000",
+                "surface-container-lowest": "#ffffff",
+                "on-surface": "#2c2a51",
+                "on-primary": "#f3f1ff",
+                "surface-dim": "#cbd5e1",
+                "inverse-primary": "#7287ff",
+                "tertiary-fixed": "#fc92e0",
+                "on-background": "#2c2a51",
+                "on-primary-container": "#00156e",
+                "tertiary-dim": "#842b73",
+                "surface": "#f8fafc",
+                "surface-container-highest": "#e2e8f0",
+                "surface-bright": "#f8fafc",
+                "on-tertiary-fixed-variant": "#6e165f",
+                "on-tertiary-fixed": "#3e0035",
+                "surface-container-high": "#edf2f7",
+                "on-primary-fixed-variant": "#001b86",
+                "surface-variant": "#e2e8f0",
+                "secondary": "#594aba",
+                "on-surface-variant": "#5a5781",
+                "on-error-container": "#510017",
+                "on-secondary-fixed-variant": "#4e3eaf",
+                "tertiary": "#93387f",
+                "error-container": "#f74b6d",
+                "primary": "#4c6ef5",
+                "tertiary-fixed-dim": "#ed85d1",
+                "surface-tint": "#4c6ef5",
+                "primary-container": "#8899ff",
+                "secondary-fixed-dim": "#c4bcff",
+                "inverse-surface": "#0b082f",
+                "on-error": "#ffefef",
+                "error": "#b41340",
+                "on-secondary": "#f5f0ff",
+                "on-tertiary": "#ffeef6",
+                "outline-variant": "#cbd5e1",
+                "on-tertiary-container": "#630955",
+                "on-secondary-fixed": "#301a92",
+                "surface-container": "#f1f5f9",
+                "primary-dim": "#3b5bdb"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        #side-menu.active { display: block; }
+    </style>
+</head>
+<body class="text-on-surface bg-white" style="font-family: 'Inter', sans-serif; background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[rgb(255,255,255)] border-b border-slate-100 grid grid-cols-3 items-center px-6 h-16">
+<div class="flex items-center">
+<button class="p-2 hover:bg-slate-100 rounded-lg transition-colors" onclick="document.getElementById('side-menu').classList.add('active')" style="">
+<span class="material-symbols-outlined text-black font-bold" style="">menu</span>
+</button>
+</div>
+<div class="flex items-center justify-center gap-2">
+<div class="flex items-center gap-2">
+<span class="text-[15px] font-medium text-slate-900" style="">Sistema de Información y Control Escolar (SIGED)</span>
+<span class="material-symbols-outlined text-slate-800 text-2xl" style="">school</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4">
+<div class="hidden md:flex flex-col items-end">
+<span class="text-sm font-semibold text-slate-900" style="">Susana Moreno</span>
+<button class="text-xs text-primary font-medium hover:underline" style="">Cerrar sesión</button>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-200">
+<img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9y9CgTJ7pngmHsdLXKWEm1wB3XBRlqdsp0dPIjbjxr4DIVZFmOz5yWdcMAVihSDJXhD7Na-b14xALUk4MU-ivOjCpCqMn9Frr-KQw5YoLp7u_Djadg_ggzuoZ-QkcLxTQqc-mZ-zCSUmZcpuVTHPZshN6FnwyBso2EdBLwR-tNbfx1wfQYSB104AapiSV6fbP1-kJilFgy0YHfxwCe95GP8jFWs8Wb8fZ4o10jUFQk_pc-KPN6pNqaGoDJsHQSowhZE29UJf4B34H" style="">
+</div>
+</div>
+</nav>
+<!-- Content Wrapper -->
+<div class="pt-24 pb-12 px-6 md:px-8 lg:px-12 w-full min-h-screen flex flex-col">
+<!-- Header Panel -->
+<header class="mb-10 w-full">
+<section class="relative bg-slate-50 border border-slate-200 rounded-sm p-6 text-slate-900 w-full shadow-sm flex flex-col justify-center overflow-hidden border-t-4 border-t-primary mb-6"><div class="absolute top-4 right-6 z-20">
+<a class="inline-flex items-center gap-1.5 transition-colors group text-slate-500 hover:text-slate-700" href="#" style="">
+<span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform" style="">arrow_back</span>
+<span class="text-xs font-bold uppercase tracking-wider" style="">Volver a Gestión de Planes de estudio</span>
+</a>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-sm" style="">location_on</span>
+<span class="text-xs font-bold uppercase tracking-wider" style="">Escuela Municipal Capulí Loma</span>
+<span class="mx-2 text-slate-300" style="">/</span>
+<span class="text-xs font-bold uppercase tracking-wider" style="">Plan: Bachillerato General Unificado</span>
+</div>
+<h2 class="text-3xl font-bold tracking-tight text-slate-900" style="">Gestión de Grados Académicos</h2>
+<p class="text-slate-600 text-base" style="">Administre los niveles educativos y sus respectivas asignaturas.</p>
+</div>
+<div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none">
+<span class="material-symbols-outlined text-8xl text-primary" style="">school</span>
+</div>
+</section>
+<!-- Actions Bar: Search and New Grade aligned -->
+<div class="flex flex-col sm:flex-row items-center gap-4 mt-10 justify-between">
+<div class="relative w-full md:max-w-2xl">
+<input class="w-full pl-6 pr-14 py-3.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-700 placeholder:text-slate-400 font-body transition-all" placeholder="Buscar por nombre..." type="text">
+<div class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#eef2ff] text-primary rounded-full flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-xl font-bold" style="">search</span>
+</div>
+</div>
+<button class="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-[#4c6ef5] text-white rounded-lg font-bold shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all text-sm" style="">
+<span class="material-symbols-outlined font-bold" style="">add</span>
+                    Nuevo Grado
+                </button>
+</div>
+</header>
+<!-- Main Content: Grades Table -->
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden mb-8 w-full">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#4c6ef5] text-white text-[11px] font-bold uppercase tracking-wider">
+<th class="py-4 px-6 border-b border-white/10 cursor-pointer hover:bg-[#3b5bdb] transition-colors" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Nombre</span>
+<span class="material-symbols-outlined text-base" style="">swap_vert</span>
+</div>
+</th>
+<th class="py-4 px-6 border-b border-white/10 cursor-pointer hover:bg-[#3b5bdb] transition-colors" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Orden</span>
+<span class="material-symbols-outlined text-base" style="">swap_vert</span>
+</div>
+</th>
+<th class="py-4 px-6 border-b border-white/10 cursor-pointer hover:bg-[#3b5bdb] transition-colors" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Nivel</span>
+<span class="material-symbols-outlined text-base" style="">swap_vert</span>
+</div>
+</th>
+<th class="py-4 px-6 border-b border-white/10 cursor-pointer hover:bg-[#3b5bdb] transition-colors" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Subnivel</span>
+<span class="material-symbols-outlined text-base" style="">swap_vert</span>
+</div>
+</th>
+<th class="py-4 px-6 border-b border-white/10 text-right" style="">Acciones</th>
+</tr>
+</thead>
+<tbody class="text-sm divide-y divide-slate-100">
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-5 font-semibold text-slate-800" style="">Inicial uno&nbsp;<span style="color: rgb(148, 163, 184); font-family: Manrope, sans-serif; font-size: 12px; font-weight: 400; background-color: rgba(142, 164, 248, 0.082);">(</span><span style="color: rgb(148, 163, 184); font-family: Manrope, sans-serif; font-size: 12px; font-weight: 400; background-color: rgba(142, 164, 248, 0.082);">5</span><span style="color: rgb(148, 163, 184); font-family: Manrope, sans-serif; font-size: 12px; font-weight: 400; background-color: rgba(142, 164, 248, 0.082);">/</span><span style="color: rgb(148, 163, 184); font-family: Manrope, sans-serif; font-size: 12px; font-weight: 400; background-color: rgba(142, 164, 248, 0.082);">5</span><span style="color: rgb(148, 163, 184); font-family: Manrope, sans-serif; font-size: 12px; font-weight: 400; background-color: rgba(142, 164, 248, 0.082);">&nbsp;pp)</span></td>
+<td class="px-6 py-5" style="">
+<span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-xs font-bold border border-slate-200" style="">1</span>
+</td>
+<td class="px-6 py-5 text-slate-600" style="">Educación inicial</td>
+<td class="px-6 py-5 text-slate-600" style="">-</td>
+<td class="px-6 py-5 text-right" style="">
+<div class="flex justify-end items-center gap-3">
+<button class="flex items-center gap-1.5 py-1.5 px-3 bg-green-50 text-green-700 border border-green-100 rounded-lg transition-colors hover:bg-green-600 hover:text-white" style="">
+<span class="material-symbols-outlined text-base font-bold" style="">edit</span>
+<span class="font-bold" style="">Editar</span>
+</button>
+<button class="flex items-center gap-1.5 py-1.5 px-3 bg-red-50 text-red-700 border border-red-100 rounded-lg transition-colors hover:bg-red-600 hover:text-white" style="">
+<span class="material-symbols-outlined text-base font-bold" style="">delete</span>
+<span class="font-bold" style="">Eliminar</span>
+</button>
+<button class="text-primary font-bold hover:underline px-2 transition-all" style="">
+                                        Ver Asignaturas
+                                    </button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-5 font-semibold text-slate-800" style=""><font color="#0a0a0a" face="Google Sans, Arial, sans-serif"><span style="font-size: 16px; font-weight: 400;">Primer grado</span></font>&nbsp;<span class="text-xs text-slate-400 font-normal" style="--tw-scale-x: 1; --tw-scale-y: 1; --tw-pan-x: ; --tw-pan-y: ; --tw-pinch-zoom: ; --tw-scroll-snap-strictness: proximity; --tw-gradient-from-position: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ; --tw-ordinal: ; --tw-slashed-zero: ; --tw-numeric-figure: ; --tw-numeric-spacing: ; --tw-numeric-fraction: ; --tw-ring-inset: ; --tw-ring-offset-width: 0px; --tw-ring-offset-color: #fff; --tw-ring-color: rgb(59 130 246 / 0.5); --tw-ring-offset-shadow: 0 0 #0000; --tw-ring-shadow: 0 0 #0000; --tw-shadow: 0 0 #0000; --tw-shadow-colored: 0 0 #0000; --tw-blur: ; --tw-brightness: ; --tw-contrast: ; --tw-grayscale: ; --tw-hue-rotate: ; --tw-invert: ; --tw-saturate: ; --tw-sepia: ; --tw-drop-shadow: ; --tw-backdrop-blur: ; --tw-backdrop-brightness: ; --tw-backdrop-contrast: ; --tw-backdrop-grayscale: ; --tw-backdrop-hue-rotate: ; --tw-backdrop-invert: ; --tw-backdrop-opacity: ; --tw-backdrop-saturate: ; --tw-backdrop-sepia: ; --tw-contain-size: ; --tw-contain-layout: ; --tw-contain-paint: ; --tw-contain-style: ; font-weight: 400; --tw-text-opacity: 1; color: rgb(148, 163, 184); font-family: Manrope, sans-serif;">(0/2&nbsp;pp)</span><span class="ml-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200" style="--tw-scale-x: 1; --tw-scale-y: 1; --tw-pan-x: ; --tw-pan-y: ; --tw-pinch-zoom: ; --tw-scroll-snap-strictness: proximity; --tw-gradient-from-position: ; --tw-gradient-via-position: ; --tw-gradient-to-position: ; --tw-ordinal: ; --tw-slashed-zero: ; --tw-numeric-figure: ; --tw-numeric-spacing: ; --tw-numeric-fraction: ; --tw-ring-inset: ; --tw-ring-offset-width: 0px; --tw-ring-offset-color: #fff; --tw-ring-color: rgb(59 130 246 / 0.5); --tw-ring-offset-shadow: 0 0 #0000; --tw-ring-shadow: 0 0 #0000; --tw-shadow: 0 0 #0000; --tw-shadow-colored: 0 0 #0000; --tw-blur: ; --tw-brightness: ; --tw-contrast: ; --tw-grayscale: ; --tw-hue-rotate: ; --tw-invert: ; --tw-saturate: ; --tw-sepia: ; --tw-drop-shadow: ; --tw-backdrop-blur: ; --tw-backdrop-brightness: ; --tw-backdrop-contrast: ; --tw-backdrop-grayscale: ; --tw-backdrop-hue-rotate: ; --tw-backdrop-invert: ; --tw-backdrop-opacity: ; --tw-backdrop-saturate: ; --tw-backdrop-sepia: ; --tw-contain-size: ; --tw-contain-layout: ; --tw-contain-paint: ; --tw-contain-style: ; border-color: rgb(253, 230, 138); margin-left: 0.25rem; border-radius: 9999px; --tw-border-opacity: 1; --tw-bg-opacity: 1; background-color: rgb(255, 251, 235); --tw-text-opacity: 1; color: rgb(217, 119, 6); font-family: Manrope, sans-serif;">Alerta</span></td>
+<td class="px-6 py-5" style="">
+<span class="bg-slate-100 text-slate-700 px-3 py-1 rounded text-xs font-bold border border-slate-200" style="">2</span>
+</td>
+<td class="px-6 py-5 text-slate-600" style="">Educación General Báica</td>
+<td class="px-6 py-5 text-slate-600" style="">Preparatoria</td>
+<td class="px-6 py-5 text-right" style="">
+<div class="flex justify-end items-center gap-3">
+<button class="flex items-center gap-1.5 py-1.5 px-3 bg-green-50 text-green-700 border border-green-100 rounded-lg transition-colors hover:bg-green-600 hover:text-white" style="">
+<span class="material-symbols-outlined text-base font-bold" style="">edit</span>
+<span class="font-bold" style="">Editar</span>
+</button>
+<button class="flex items-center gap-1.5 py-1.5 px-3 bg-red-50 text-red-700 border border-red-100 rounded-lg transition-colors hover:bg-red-600 hover:text-white" style="">
+<span class="material-symbols-outlined text-base font-bold" style="">delete</span>
+<span class="font-bold" style="">Eliminar</span>
+</button>
+<button class="text-primary font-bold hover:underline px-2 transition-all" style="">
+                                        Ver Asignaturas
+                                    </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/30">
+<div class="text-sm text-slate-500 font-medium" style="">
+                    Mostrando <span class="text-slate-900 font-bold" style="">2</span> registros de un total de <span class="text-slate-900 font-bold" style="">2</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-white hover:text-primary transition-all disabled:opacity-30 disabled:pointer-events-none" disabled="" style="">
+<span class="material-symbols-outlined text-lg" style="">chevron_left</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-sm shadow-sm" style="">1</button>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-white hover:text-primary transition-all disabled:opacity-30 disabled:pointer-events-none" disabled="" style="">
+<span class="material-symbols-outlined text-lg" style="">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Detailed Section: Asignaturas -->
+<section class="p-8 border border-outline-variant/10 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 w-full bg-slate-50 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+<div class="flex items-center gap-4">
+<div class="h-10 w-1.5 bg-primary rounded-full"></div>
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-surface" style="">Asignaturas Vinculadas</h3>
+<p class="text-sm text-on-surface-variant" style=""><span class="font-bold text-primary" style="">Inicial uno</span></p>
+</div>
+</div>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-[#4c6ef5]/10 text-primary rounded-lg font-bold hover:bg-[#4c6ef5]/20 transition-all text-sm border border-primary/20" style="">
+<span class="material-symbols-outlined" style="">add_circle</span>Nueva Asignatura
+                </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Asignatura Card 1 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" style="">calculate</span>
+</div>
+<h4 class="font-bold text-lg text-on-surface" style="">Matemáticas</h4>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest" style="">Períodos mínimos semanales</span>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-3xl font-extrabold text-on-surface" style="">3.0</span>
+<span class="text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200 uppercase" style="">HORAS</span>
+</div>
+<div class="flex gap-1.5">
+<button class="p-2 bg-green-50 text-green-700 rounded-lg transition-colors hover:bg-green-600 hover:text-white border border-green-100" title="Editar" style=""><span class="material-symbols-outlined text-lg font-bold" style="">edit</span></button>
+<button class="p-2 bg-red-50 text-red-700 rounded-lg transition-colors hover:bg-red-600 hover:text-white border border-red-100" title="Eliminar" style=""><span class="material-symbols-outlined text-lg font-bold" style="">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Asignatura Card 2 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-tertiary/10 rounded-lg flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-2xl" style="">book</span>
+</div>
+<h4 class="font-bold text-lg text-on-surface" style="">Lengua y Literatura</h4>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest" style="">Períodos mínimos semanales</span>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-3xl font-extrabold text-on-surface" style="">1.0</span>
+<span class="text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200 uppercase" style="">HORAS</span>
+</div>
+<div class="flex gap-1.5">
+<button class="p-2 bg-green-50 text-green-700 rounded-lg transition-colors hover:bg-green-600 hover:text-white border border-green-100" title="Editar" style=""><span class="material-symbols-outlined text-lg font-bold" style="">edit</span></button>
+<button class="p-2 bg-red-50 text-red-700 rounded-lg transition-colors hover:bg-red-600 hover:text-white border border-red-100" title="Eliminar" style=""><span class="material-symbols-outlined text-lg font-bold" style="">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Asignatura Card 3 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl" style="">translate</span>
+</div>
+<h4 class="font-bold text-lg text-on-surface" style="">Inglés</h4>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest" style="">Períodos mínimos semanales</span>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-3xl font-extrabold text-on-surface" style="">1.0</span>
+<span class="text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200 uppercase" style="">HORAS</span>
+</div>
+<div class="flex gap-1.5">
+<button class="p-2 bg-green-50 text-green-700 rounded-lg transition-colors hover:bg-green-600 hover:text-white border border-green-100" title="Editar" style=""><span class="material-symbols-outlined text-lg font-bold" style="">edit</span></button>
+<button class="p-2 bg-red-50 text-red-700 rounded-lg transition-colors hover:bg-red-600 hover:text-white border border-red-100" title="Eliminar" style=""><span class="material-symbols-outlined text-lg font-bold" style="">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 mt-auto flex flex-col items-center justify-center text-slate-400">
+<p class="text-xs font-['Inter'] tracking-wide" style="">@ 2024 SIGED</p>
+</footer>
+<!-- Sidebar Navigation -->
+<div class="hidden fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" id="side-menu">
+<aside class="fixed left-0 top-0 h-full w-72 z-[70] flex flex-col shadow-2xl transition-transform duration-300" style="background-color: rgb(51, 0, 153);">
+<div class="p-6 flex justify-between items-start">
+<div class="flex items-center gap-2 text-white">
+<span class="material-symbols-outlined text-6xl text-white" style="font-variation-settings: &quot;FILL&quot; 1;">groups</span>
+</div>
+<button class="hover:bg-white/10 rounded-full p-1 transition-colors" id="close-menu" onclick="document.getElementById('side-menu').classList.remove('active')" style="">
+<span class="material-symbols-outlined text-2xl text-white" style="">close</span>
+</button>
+</div>
+<nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/5 hover:text-white rounded-lg font-medium transition-all" href="#" style="">
+<span class="material-symbols-outlined" style="">arrow_back</span>
+<span class="" style="">Volver al menú Principal</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/5 hover:text-white rounded-lg font-medium transition-all" href="#" style="">
+<span class="material-symbols-outlined" style="">domain</span>
+<span class="" style="">Mi institución</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-white rounded-lg font-bold transition-all" href="#" style="background-color: rgb(115, 153, 255);">
+<span class="material-symbols-outlined" style="">menu_book</span>
+<span class="" style="">Planes de estudio</span>
+</a>
+</nav>
+</aside>
+</div>
+</body></html>

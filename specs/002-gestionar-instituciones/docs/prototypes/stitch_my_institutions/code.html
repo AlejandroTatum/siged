@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGED - Mis Instituciones</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4c6ef5",
+              "sidebar-deep": "#330099",
+              "sidebar-active": "#7399FF",
+              "sidebar-hover": "#6488EE",
+              "background-light": "#f5f6f8",
+              "background-dark": "#0f1223",
+            },
+            fontFamily: {
+              "display": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #ffffff;
+        }
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar-visible {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="text-slate-900 bg-white overflow-hidden h-screen flex flex-col">
+<!-- Sidebar Sidebar Menu -->
+<div class="fixed inset-0 z-[100] hidden" id="sidebar-container">
+<!-- Overlay -->
+<div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="sidebar-overlay"></div>
+<!-- Sidebar Content -->
+<aside class="absolute left-0 top-0 h-full w-[280px] bg-sidebar-deep text-white shadow-2xl sidebar-hidden" id="sidebar">
+<!-- Sidebar Header -->
+<div class="p-6 flex justify-between items-start">
+<span class="material-symbols-outlined text-6xl text-white" style="font-variation-settings: 'FILL' 1;">groups</span>
+<button class="hover:bg-white/10 rounded-full p-1 transition-colors" id="close-menu">
+<span class="material-symbols-outlined text-4xl font-light">cancel</span>
+</button>
+</div>
+<!-- Sidebar Navigation -->
+<nav class="mt-4">
+<!-- Menú principal -->
+<a class="flex items-center gap-4 px-6 py-5 hover:bg-sidebar-hover transition-colors" href="#">
+<span class="material-symbols-outlined text-3xl">home</span>
+<span class="text-[17px] font-medium">Menú principal</span>
+</a>
+<!-- Mis instituciones (Active) -->
+<a class="flex items-center gap-4 px-6 py-5 bg-sidebar-active hover:bg-sidebar-hover transition-colors" href="#">
+<span class="material-symbols-outlined text-3xl">group</span>
+<span class="text-[17px] font-bold">Mis instituciones</span>
+</a>
+</nav>
+</aside>
+</div>
+<!-- Top Bar -->
+<header class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-4 shrink-0 z-50">
+<!-- Left: Hamburger Menu -->
+<div class="flex-1 flex items-center">
+<button class="w-10 h-10 bg-black text-white rounded-md flex items-center justify-center hover:bg-slate-800 transition-colors focus:outline-none" id="menu-button">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+<!-- Center: Title and Icon -->
+<div class="flex items-center gap-2">
+<span class="text-[15px] font-medium text-slate-900">Sistema de Información y Control Escolar (SIGED)</span>
+<span class="material-symbols-outlined text-slate-800 text-2xl">school</span>
+</div>
+<!-- Right: User Info -->
+<div class="flex-1 flex flex-col items-end justify-center leading-tight">
+<p class="text-[13px] font-bold text-slate-900">Susana Moreno</p>
+<a class="text-[13px] font-medium text-primary hover:underline" href="#">Cerrar sesión</a>
+</div>
+</header>
+<!-- Main Content (Scrollable Area) -->
+<main class="flex-grow overflow-y-auto bg-white">
+<div class="space-y-8 px-8 py-8">
+<!-- Optimized Compact Header Section - Matching SCREEN_26 style -->
+<section class="relative bg-slate-50 border border-slate-200 rounded-sm p-6 text-slate-900 w-full shadow-sm flex flex-col justify-center overflow-hidden border-t-4 border-t-primary">
+<div class="relative z-10">
+<h2 class="text-3xl font-bold mb-1 tracking-tight text-slate-900">Mis instituciones</h2>
+<p class="text-slate-600 text-base">Acceda y gestione sus instituciones educativas asignadas.</p>
+</div>
+<!-- Scaled down graduation cap illustration on the right side -->
+<div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none">
+<span class="material-symbols-outlined text-8xl text-primary">school</span>
+</div>
+</section>
+<!-- Institutions Grid Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="bg-white border border-slate-200 rounded-sm overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow h-full min-h-[300px]">
+<div class="pt-8 pb-6 px-6 flex flex-col items-center text-center flex-grow justify-center">
+<div class="mb-6">
+<span class="material-symbols-outlined text-7xl text-slate-800">school</span>
+</div>
+<h3 class="text-[18px] font-bold text-slate-900 leading-tight">Escuela Municipal Capulí Loma</h3>
+<p class="text-[13px] text-slate-500 mt-2">Código AMIE: 000011111</p>
+</div>
+<button class="w-full bg-primary text-white py-4 flex items-center justify-center gap-2 font-bold text-[15px] hover:bg-[#3b5bdb] transition-colors mt-auto">
+                    Ingresar
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 700;">check</span>
+</button>
+</div>
+<!-- Card 2 -->
+<div class="bg-white border border-slate-200 rounded-sm overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow h-full min-h-[300px]">
+<div class="pt-8 pb-6 px-6 flex flex-col items-center text-center flex-grow justify-center">
+<div class="mb-6">
+<span class="material-symbols-outlined text-7xl text-slate-800">school</span>
+</div>
+<h3 class="text-[18px] font-bold text-slate-900 leading-tight">Escuela Municipal Borja</h3>
+<p class="text-[13px] text-slate-500 mt-2">Código AMIE: 00000000</p>
+</div>
+<button class="w-full bg-primary text-white py-4 flex items-center justify-center gap-2 font-bold text-[15px] hover:bg-[#3b5bdb] transition-colors mt-auto">
+                    Ingresar
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 700;">check</span>
+</button>
+</div>
+<!-- Card 3 -->
+<div class="bg-white border border-slate-200 rounded-sm overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow h-full min-h-[300px]">
+<div class="pt-8 pb-6 px-6 flex flex-col items-center text-center flex-grow justify-center">
+<div class="mb-6">
+<span class="material-symbols-outlined text-7xl text-slate-800">school</span>
+</div>
+<h3 class="text-[18px] font-bold text-slate-900 leading-tight">Escuela Municipal Pradera</h3>
+<p class="text-[13px] text-slate-500 mt-2">Código AMIE: 00000000</p>
+</div>
+<button class="w-full bg-primary text-white py-4 flex items-center justify-center gap-2 font-bold text-[15px] hover:bg-[#3b5bdb] transition-colors mt-auto">
+                    Ingresar
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 700;">check</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Footer -->
+<footer class="p-8 text-center text-slate-400 text-xs shrink-0">@ 2024 SIGED</footer>
+<script>
+    const menuBtn = document.getElementById('menu-button');
+    const closeBtn = document.getElementById('close-menu');
+    const sidebarContainer = document.getElementById('sidebar-container');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openSidebar() {
+        sidebarContainer.classList.remove('hidden');
+        setTimeout(() => {
+            sidebar.classList.remove('sidebar-hidden');
+            sidebar.classList.add('sidebar-visible');
+        }, 10);
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('sidebar-visible');
+        sidebar.classList.add('sidebar-hidden');
+        setTimeout(() => {
+            sidebarContainer.classList.add('hidden');
+        }, 300);
+    }
+
+    menuBtn.addEventListener('click', openSidebar);
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+</script>
+</body></html>

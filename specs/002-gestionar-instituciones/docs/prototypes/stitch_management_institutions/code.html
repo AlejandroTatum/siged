@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGED - Gestión de Instituciones Educativas</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4c6ef5",
+              "sidebar-deep": "#330099",
+              "sidebar-active": "#7399FF",
+              "sidebar-hover": "#6488EE",
+              "background-light": "#f5f6f8",
+              "secondary-purple": "#4f00d9",
+            },
+            fontFamily: {
+              "display": ["Manrope"],
+              "body": ["Inter"],
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar-visible {
+            transform: translateX(0);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .header-pattern {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#4c6ef5 0.5px, transparent 0.5px), radial-gradient(#4c6ef5 0.5px, #f8fafc 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            opacity: 0.05;
+        }
+    </style>
+</head>
+<body class="text-slate-900 bg-white flex flex-col">
+<!-- Sidebar Menu -->
+<div class="fixed inset-0 z-[100] hidden" id="sidebar-container">
+<!-- Overlay -->
+<div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="sidebar-overlay"></div>
+<!-- Sidebar Content -->
+<aside class="absolute left-0 top-0 h-full w-[280px] bg-sidebar-deep text-white shadow-2xl sidebar-hidden" id="sidebar">
+<!-- Sidebar Header -->
+<div class="p-6 flex justify-between items-start">
+<span class="material-symbols-outlined text-6xl text-white" style='font-variation-settings: "FILL" 1;'>groups</span>
+<button class="hover:bg-white/10 rounded-full p-1 transition-colors" id="close-menu" style="">
+<span class="material-symbols-outlined text-4xl font-light" style="">cancel</span>
+</button>
+</div>
+<!-- Sidebar Navigation -->
+<nav class="mt-4">
+<a class="flex items-center gap-4 px-6 py-5 hover:bg-sidebar-hover transition-colors" href="#" style="">
+<span class="material-symbols-outlined text-2xl" style="">home</span>
+<span class="text-[17px] font-bold" style="">Menú principal</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-5 bg-sidebar-active hover:bg-sidebar-hover transition-colors" href="#" style="">
+<span class="material-symbols-outlined text-2xl" style="">school</span>
+<span class="text-[17px] font-bold" style="">Instituciones</span>
+</a>
+</nav>
+</aside>
+</div>
+<!-- Top Bar -->
+<header class="h-16 bg-white border-b border-slate-200 flex shrink-0 justify-between items-center px-4 z-50">
+<!-- Left: Hamburger Menu -->
+<div class="flex-1 flex items-center">
+<button class="w-10 h-10 bg-black text-white rounded-md flex items-center justify-center hover:bg-slate-800 transition-colors focus:outline-none" id="menu-button" style="">
+<span class="material-symbols-outlined text-2xl" style="">menu</span>
+</button>
+</div>
+<!-- Center: Title and Icon -->
+<div class="flex items-center gap-2">
+<span class="text-[15px] font-medium text-slate-900" style="">Sistema de Información y Control Escolar (SIGED)</span>
+<span class="material-symbols-outlined text-slate-800 text-2xl" style="">school</span>
+</div>
+<!-- Right: User Info -->
+<div class="flex-1 flex flex-col items-end justify-center leading-tight">
+<p class="text-[13px] font-bold text-slate-900" style="">Adm. Sistema</p>
+<a class="text-[13px] font-medium text-primary hover:underline" href="#" style="">Cerrar sesión</a>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<div class="flex-1 overflow-y-auto no-scrollbar space-y-8 px-8 py-8">
+<!-- Optimized Compact Header Section -->
+<section class="relative bg-slate-50 border border-slate-200 rounded-sm p-6 text-slate-900 w-full shadow-sm flex flex-col justify-center overflow-hidden border-t-4 border-t-primary">
+<div class="relative z-10">
+<h2 class="text-3xl font-bold mb-1 tracking-tight text-slate-900" style="">Gestión de instituciones educativas</h2>
+<p class="text-slate-600 text-base" style="">Administra los datos principales y autoridades académicas de las instituciones</p>
+</div>
+<!-- Scaled down graduation cap illustration -->
+<div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none">
+<span class="material-symbols-outlined text-8xl text-primary" style="">school</span>
+</div>
+</section>
+<!-- Action Bar: Search and Button -->
+<div class="flex flex-col md:flex-row gap-4 items-center justify-between py-2">
+<!-- Search bar -->
+<div class="relative w-full md:max-w-xl">
+<input class="w-full pl-6 pr-14 py-3.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-700 placeholder:text-slate-400 font-body transition-all" placeholder="Buscar por nombre, código o RUC..." type="text"/>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#eef2ff] text-primary rounded-full flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-xl font-bold" style="">search</span>
+</div>
+</div>
+<!-- Primary Button -->
+<button class="w-full md:w-auto flex items-center justify-center gap-2 bg-primary text-white px-8 py-3.5 rounded-lg font-bold hover:shadow-lg hover:bg-[#3d5ed9] transition-all active:scale-95" style="">
+<span class="material-symbols-outlined" style="">add</span>
+<span class="" style="">Nueva institución</span>
+</button>
+</div>
+<!-- Table Section -->
+<div class="mt-4 border border-slate-200 rounded-sm overflow-hidden shadow-sm bg-white">
+<div class="overflow-x-auto no-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-white">
+<th class="px-6 py-6 font-display font-bold text-[15px] uppercase tracking-wider border-r border-white/10" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Nombre de la institución</span>
+<span class="material-symbols-outlined text-lg opacity-70" style="">unfold_more</span>
+</div>
+</th>
+<th class="px-6 py-6 font-display font-bold text-[15px] uppercase tracking-wider border-r border-white/10" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Código</span>
+<span class="material-symbols-outlined text-lg opacity-70" style="">unfold_more</span>
+</div>
+</th>
+<th class="px-6 py-6 font-display font-bold text-[15px] uppercase tracking-wider border-r border-white/10" style="">
+<div class="flex items-center gap-2">
+<span class="" style="">Ruc</span>
+<span class="material-symbols-outlined text-lg opacity-70" style="">unfold_more</span>
+</div>
+</th>
+<th class="px-6 py-6 font-display font-bold text-[15px] uppercase tracking-wider border-r border-white/10" style="">Autoridades académicas</th>
+<th class="px-6 py-6 font-display font-bold text-[15px] uppercase tracking-wider text-center" style="">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-5" style="">
+<span class="font-bold text-slate-800 text-[15px]" style="">Escuela Municipal Capulí Loma</span>
+</td>
+<td class="px-6 py-5 text-slate-600 font-medium" style="">07H00574</td>
+<td class="px-6 py-5 text-slate-600 font-medium" style="">110215483001</td>
+<td class="px-6 py-5 align-middle" style="">
+<div class="flex items-center gap-3">
+<div class="flex flex-wrap gap-2">
+<div class="inline-flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 w-48">
+<span class="material-symbols-outlined text-[18px] text-slate-500" style="">account_circle</span>
+<span class="text-slate-800 font-medium text-[13px] truncate block flex-1" style="">Lissette Maldonado</span>
+</div>
+</div>
+<a class="flex items-center gap-1 text-primary text-[13px] font-bold hover:underline ml-auto" href="#" style="">
+<span class="material-symbols-outlined text-[16px]" style="">settings</span>
+<span class="" style="">Gestionar</span>
+</a>
+</div>
+</td>
+<td class="px-6 py-5" style="">
+<div class="flex items-center justify-center gap-2">
+<button class="flex items-center gap-2 bg-[#dcfce7] text-[#166534] px-4 py-1.5 rounded text-[13px] font-bold hover:bg-[#16a34a] hover:text-white transition-colors duration-200" style="">
+<span class="material-symbols-outlined text-sm" style="">edit</span>
+                                        Editar
+                                    </button>
+<button class="flex items-center gap-2 bg-[#fee2e2] text-[#991b1b] px-4 py-1.5 rounded text-[13px] font-bold hover:bg-red-600 hover:text-white transition-colors duration-200" style="">
+<span class="material-symbols-outlined text-sm" style="">delete</span>
+                                        Eliminar
+                                    </button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-6 py-5" style="">
+<span class="font-bold text-slate-800 text-[15px]" style="">Unidad Educativa del Milenio "Amazonas"</span>
+</td>
+<td class="px-6 py-5 text-slate-600 font-medium" style="">08H11923</td>
+<td class="px-6 py-5 text-slate-600 font-medium" style="">179213847201</td>
+<td class="px-6 py-5 align-middle" style="">
+<div class="flex items-center gap-3">
+<div class="flex flex-col gap-2">
+<div class="inline-flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 w-48">
+<span class="material-symbols-outlined text-[18px] text-slate-500" style="">account_circle</span>
+<span class="text-slate-800 font-medium text-[13px] truncate block flex-1" style="">Ricardo Cevallos</span>
+</div>
+<div class="inline-flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 w-48">
+<span class="material-symbols-outlined text-[18px] text-slate-500" style="">account_circle</span>
+<span class="text-slate-800 font-medium text-[13px] truncate block flex-1" style="">Israel López</span>
+</div>
+</div>
+<a class="flex items-center gap-1 text-primary text-[13px] font-bold hover:underline ml-auto self-center" href="#" style="">
+<span class="material-symbols-outlined text-[16px]" style="">settings</span>
+<span class="" style="">Gestionar</span>
+</a>
+</div>
+</td>
+<td class="px-6 py-5" style="">
+<div class="flex items-center justify-center gap-2">
+<button class="flex items-center gap-2 bg-[#dcfce7] text-[#166534] px-4 py-1.5 rounded text-[13px] font-bold hover:bg-[#16a34a] hover:text-white transition-colors duration-200" style="">
+<span class="material-symbols-outlined text-sm" style="">edit</span>
+                                        Editar
+                                    </button>
+<button class="flex items-center gap-2 bg-[#fee2e2] text-[#991b1b] px-4 py-1.5 rounded text-[13px] font-bold hover:bg-red-600 hover:text-white transition-colors duration-200" style="">
+<span class="material-symbols-outlined text-sm" style="">delete</span>
+                                        Eliminar
+                                    </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="p-6 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+<p class="text-sm text-slate-500" style="">
+                    Mostrando <span class="bg-slate-100 px-1 font-bold text-slate-800 rounded" style="">2</span> registros de un total de 100
+                </p>
+<nav class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100" style="">
+<span class="material-symbols-outlined" style="">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-white text-[13px] font-bold bg-primary" style="">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-slate-600 text-[13px] hover:bg-slate-100" style="">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-slate-600 text-[13px] hover:bg-slate-100" style="">3</button>
+<span class="px-1 text-slate-400 text-sm" style="">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-slate-600 text-[13px] hover:bg-slate-100" style="">10</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100" style="">
+<span class="material-symbols-outlined" style="">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</div>
+</main>
+<footer class="shrink-0 p-8 text-center text-slate-400 text-xs">@ 2024 SIGED</footer>
+<script>
+    const menuBtn = document.getElementById('menu-button');
+    const closeBtn = document.getElementById('close-menu');
+    const sidebarContainer = document.getElementById('sidebar-container');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openSidebar() {
+        sidebarContainer.classList.remove('hidden');
+        setTimeout(() => {
+            sidebar.classList.remove('sidebar-hidden');
+            sidebar.classList.add('sidebar-visible');
+        }, 10);
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('sidebar-visible');
+        sidebar.classList.add('sidebar-hidden');
+        setTimeout(() => {
+            sidebarContainer.classList.add('hidden');
+        }, 300);
+    }
+
+    menuBtn.addEventListener('click', openSidebar);
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+</script>
+</body></html>

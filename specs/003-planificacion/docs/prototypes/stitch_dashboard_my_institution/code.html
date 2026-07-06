@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Panel de Control: Escuela Municipal Capulí Loma</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#4c6ef5",
+                        "secondary-purple": "#4f00d9",
+                        "sidebar-deep": "#330099",
+                        "sidebar-active": "#7399FF",
+                        "sidebar-hover": "#6488EE",
+                        "surface-container": "#e9e5ff",
+                        "outline": "#75729e",
+                        "background": "#ffffff",
+                        "on-surface": "#2c2a51",
+                        "on-surface-variant": "#5a5781",
+                        "surface-container-low": "#f3eeff",
+                        "primary-container": "#8899ff",
+                        "on-primary-container": "#00156e",
+                        "secondary-container": "#d3ccff",
+                        "on-secondary-container": "#4433a5",
+                        "tertiary-container": "#fc92e0",
+                        "on-tertiary-container": "#630955",
+                        "error-container": "#f74b6d",
+                        "on-error-container": "#510017",
+                        "error": "#b41340"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar-visible {
+            transform: translateX(0);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .pattern-overlay {
+            background-image: radial-gradient(circle at 2px 2px, rgba(76,110,245,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-900 overflow-hidden h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- Sidebar Menu -->
+<div class="fixed inset-0 z-[100] hidden" id="sidebar-container">
+<!-- Overlay -->
+<div class="absolute inset-0 bg-black/30 backdrop-blur-sm" id="sidebar-overlay"></div>
+<!-- Sidebar Content -->
+<aside class="absolute left-0 top-0 h-full w-[280px] bg-sidebar-deep text-white shadow-2xl sidebar-hidden" id="sidebar">
+<!-- Sidebar Header -->
+<div class="p-6 flex justify-between items-start">
+<span class="material-symbols-outlined text-6xl text-white" style="font-variation-settings: 'FILL' 1;">groups</span>
+<button class="hover:bg-white/10 rounded-full p-1 transition-colors" id="close-menu">
+<span class="material-symbols-outlined text-4xl font-light">cancel</span>
+</button>
+</div>
+<!-- Sidebar Navigation -->
+<nav class="mt-4">
+<a class="flex items-center gap-4 px-6 py-5 hover:bg-sidebar-hover transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+<span class="text-[17px] font-bold">Volver al menú principal</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-5 bg-sidebar-active hover:bg-sidebar-hover transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="text-[17px] font-bold">Mi institución</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-5 hover:bg-sidebar-hover transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">menu_book</span>
+<span class="text-[17px] font-bold">Planes de estudio</span>
+</a>
+</nav>
+</aside>
+</div>
+<!-- Top Bar (Fixed) -->
+<header class="h-16 bg-white border-b border-slate-200 flex justify-between items-center px-8 shrink-0">
+<!-- Left: Hamburger Menu -->
+<div class="flex-1 flex items-center">
+<button class="w-10 h-10 bg-black text-white rounded-md flex items-center justify-center hover:bg-slate-800 transition-colors focus:outline-none" id="menu-button">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+<!-- Center: Title and Icon -->
+<div class="flex items-center gap-2">
+<span class="text-[15px] font-medium text-slate-900">Sistema de Información y Control Escolar (SIGED)</span>
+<span class="material-symbols-outlined text-slate-800 text-2xl">school</span>
+</div>
+<!-- Right: User Info -->
+<div class="flex-1 flex flex-col items-end justify-center leading-tight">
+<p class="text-[13px] font-bold text-slate-900">Adm. Sistema</p>
+<a class="text-[13px] font-medium text-primary hover:underline" href="#">Cerrar sesión</a>
+</div>
+</header>
+<!-- Main Content (Scrollable) -->
+<main class="flex-grow overflow-y-auto bg-white">
+<div class="p-8 w-full px-4 sm:px-8 lg:px-12">
+<!-- Full-width Institution Banner -->
+<section class="relative bg-slate-50 border border-slate-200 rounded-sm p-6 text-slate-900 w-full shadow-sm flex flex-col justify-center overflow-hidden border-t-4 border-t-primary mb-8">
+<div class="relative z-10">
+<p class="text-slate-500 font-bold uppercase tracking-widest text-[11px] mb-1">Panel de Control</p>
+<h2 class="text-3xl font-bold tracking-tight text-slate-900">Escuela Municipal Capulí Loma</h2>
+</div>
+<!-- Scaled down graduation cap illustration -->
+<div class="absolute right-8 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none">
+<span class="material-symbols-outlined text-8xl text-primary">school</span>
+</div>
+</section>
+<!-- 3-Column Top Row: Large Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<!-- Card 1: Planes de Estudio -->
+<div class="group bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 flex flex-col h-full">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<h3 class="text-xl font-bold font-headline text-slate-900 mb-2">Planes de estudio</h3>
+<p class="text-slate-500 text-sm font-body mb-8 flex-grow">Gestión del currículo académico y seguimiento de objetivos pedagógicos.</p>
+<button class="w-full py-3 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                        Administrar
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+<!-- Card 2: Funcionarios -->
+<div class="group bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 flex flex-col h-full">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">badge</span>
+</div>
+<h3 class="text-xl font-bold font-headline text-slate-900 mb-2">Funcionarios</h3>
+<p class="text-slate-500 text-sm font-body mb-8 flex-grow">Administración del personal docente, administrativo y de servicios.</p>
+<button class="w-full py-3 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                        Administrar
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+<!-- Card 3: Estudiantes -->
+<div class="group bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 flex flex-col h-full">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">group</span>
+</div>
+<h3 class="text-xl font-bold font-headline text-slate-900 mb-2">Estudiantes</h3>
+<p class="text-slate-500 text-sm font-body mb-8 flex-grow">Control de alumnos y sus representantes legales.</p>
+<button class="w-full py-3 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                        Administrar
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Large Card: Años Lectivos (Full Width Fluid) -->
+<div class="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 mb-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+</div>
+<div>
+<h3 class="text-2xl font-black font-headline text-slate-900">Años Lectivos</h3>
+<p class="text-slate-500 text-sm">Configuración y seguimiento del periodo académico</p>
+</div>
+</div>
+<div class="bg-slate-50 px-6 py-4 rounded-xl border border-slate-100 flex flex-col items-end">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Año lectivo actual</span>
+<span class="text-3xl font-black text-primary leading-none">2023-2024</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+<a class="flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">account_tree</span>
+<span class="font-bold text-slate-700 text-sm">Distributivos</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors text-lg">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<span class="font-bold text-slate-700 text-sm">Carga horaria</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors text-lg">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">how_to_reg</span>
+<span class="font-bold text-slate-700 text-sm">Matrículas</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors text-lg">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">grade</span>
+<span class="font-bold text-slate-700 text-sm">Calificaciones</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors text-lg">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">person_check</span>
+<span class="font-bold text-slate-700 text-sm">Asistencias</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors text-lg">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">laptop_chromebook</span>
+<span class="font-bold text-slate-700 text-sm">Aula virtual</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors text-lg">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Fixed) -->
+<footer class="py-4 text-center text-slate-400 text-xs shrink-0">@ 2024 SIGED</footer>
+<script>
+        const menuBtn = document.getElementById('menu-button');
+        const closeBtn = document.getElementById('close-menu');
+        const sidebarContainer = document.getElementById('sidebar-container');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            sidebarContainer.classList.remove('hidden');
+            setTimeout(() => {
+                sidebar.classList.remove('sidebar-hidden');
+                sidebar.classList.add('sidebar-visible');
+            }, 10);
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('sidebar-visible');
+            sidebar.classList.add('sidebar-hidden');
+            setTimeout(() => {
+                sidebarContainer.classList.add('hidden');
+            }, 300);
+        }
+
+        menuBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+    </script>
+</body></html>

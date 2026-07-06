@@ -1,0 +1,24 @@
+.atl/*.cache.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Django / SQLite local data
+*.sqlite3
+db.sqlite3
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
