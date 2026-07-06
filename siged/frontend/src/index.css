@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-primary: #4c6ef5;
+  --color-secondary: #4f00d9;
+  --color-accent: #6d5efc;
+  --color-success: #16a34a;
+  --color-warning: #eab308;
+  --color-danger: #dc2626;
+  --color-header-top: #ffffff;
+  --color-sidebar: #330099;
+  --color-sidebar-active: #7399ff;
+  --color-sidebar-hover: #6488ee;
+  --color-heading-block: #f8fafc;
+  --color-heading-block-border: #4c6ef5;
+  --color-text-body: #2f3542;
+  --color-text-heading: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+  --color-text-disabled: #94a3b8;
+  --color-text-inverse: #ffffff;
+  --color-border: #e2e8f0;
+  --color-overlay: rgba(0, 0, 0, 0.3);
+  --color-dark: #000000;
+  --color-dark-hover: #1e293b;
+
+  /* Input states */
+  --color-input-bg: #f9fafb;
+  --color-input-border: #d1d5db;
+  --color-input-placeholder: #9ca3af;
+
+  /* Error states */
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+  --color-error-border-strong: #f87171;
+  --color-error-text: #dc2626;
+  --color-error-text-strong: #b91c1c;
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+}
+
+/* Material Symbols icon font */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  vertical-align: middle;
+}
+
+/* Base body styles */
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-text-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

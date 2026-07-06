@@ -5,6 +5,9 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+.coverage
+htmlcov/
+.pytest_cache/
 
 # Django / SQLite local data
 *.sqlite3
@@ -14,6 +17,7 @@ db.sqlite3
 node_modules/
 dist/
 build/
+*.tsbuildinfo
 .env
 .env.*
 !.env.example
