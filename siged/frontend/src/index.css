@@ -53,6 +53,41 @@
   vertical-align: middle;
 }
 
+.material-symbols-outlined.text-2xl {
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
+}
+
+.material-symbols-outlined.text-3xl {
+  font-size: var(--text-3xl);
+  line-height: var(--text-3xl--line-height);
+}
+
+.material-symbols-outlined.text-4xl {
+  font-size: var(--text-4xl);
+  line-height: var(--text-4xl--line-height);
+}
+
+.material-symbols-outlined.text-6xl {
+  font-size: var(--text-6xl);
+  line-height: var(--text-6xl--line-height);
+}
+
+.material-symbols-outlined.text-7xl {
+  font-size: var(--text-7xl);
+  line-height: var(--text-7xl--line-height);
+}
+
+.material-symbols-outlined.text-8xl {
+  font-size: var(--text-8xl);
+  line-height: var(--text-8xl--line-height);
+}
+
+.material-symbols-outlined.text-\[18px\] {
+  font-size: 18px;
+  line-height: 1;
+}
+
 /* Base body styles */
 body {
   font-family: var(--font-body);
