@@ -52,11 +52,15 @@ describe("authApi", () => {
       };
       const mockResponse = {
         ok: false,
+        status: 401,
         json: () => Promise.resolve({ error: "Credenciales inválidas" }),
       };
       mockFetch.mockResolvedValue(mockResponse);
 
-      await expect(login(credentials)).rejects.toThrow();
+      await expect(login(credentials)).rejects.toMatchObject({
+        status: 401,
+        data: expect.objectContaining({ error: expect.any(String) }),
+      });
     });
   });
 
@@ -85,11 +89,15 @@ describe("authApi", () => {
     it("should throw on logout without token", async () => {
       const mockResponse = {
         ok: false,
+        status: 401,
         json: () => Promise.resolve({ error: "No autenticado" }),
       };
       mockFetch.mockResolvedValue(mockResponse);
 
-      await expect(logout("invalid-token")).rejects.toThrow();
+      await expect(logout("invalid-token")).rejects.toMatchObject({
+        status: 401,
+        data: expect.objectContaining({ error: expect.any(String) }),
+      });
     });
   });
 });

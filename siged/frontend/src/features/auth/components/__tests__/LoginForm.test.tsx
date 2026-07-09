@@ -118,4 +118,44 @@ describe("LoginForm", () => {
       expect(onSuccess).toHaveBeenCalled();
     });
   });
+
+  it("should show general error on invalid credentials (RF-003)", async () => {
+    const { mockLogin } = renderLoginForm();
+    mockLogin.mockRejectedValue({
+      status: 401,
+      data: { error: "Credenciales inválidas" },
+    });
+
+    fireEvent.change(screen.getByLabelText(/número de identificación/i), {
+      target: { value: "wrong" },
+    });
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+      target: { value: "wrong" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /ingresar al sistema/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/credenciales inválidas/i)).toBeInTheDocument();
+    });
+  });
+
+  it("should show general error on inactive account (RF-004)", async () => {
+    const { mockLogin } = renderLoginForm();
+    mockLogin.mockRejectedValue({
+      status: 403,
+      data: { error: "Cuenta inactiva" },
+    });
+
+    fireEvent.change(screen.getByLabelText(/número de identificación/i), {
+      target: { value: "12345678" },
+    });
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+      target: { value: "mypassword" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /ingresar al sistema/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/cuenta inactiva/i)).toBeInTheDocument();
+    });
+  });
 });

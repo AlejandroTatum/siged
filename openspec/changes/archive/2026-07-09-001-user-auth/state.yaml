@@ -1,0 +1,36 @@
+# SDD State — 001-user-auth
+# Feature review and cleanup
+
+change: 001-user-auth
+project: siged
+status: verify-complete
+next_recommended: archive  # synced 2026-07-09
+phase: verify
+verify_rerun: 2026-07-09
+verify_result: PASS
+
+# Session metadata
+session:
+  artifact_store: openspec
+  execution_mode: auto
+  chained_pr_strategy: auto-forecast
+  review_budget: 400
+
+# Context sources
+spec_source: openspec/changes/001-user-auth/specs/auth/spec.md
+tasks_source: openspec/changes/001-user-auth/tasks.md
+
+# Review workload from tasks
+review_workload:
+  estimated_lines: 130-180
+  budget_risk: low
+  chained_prs_recommended: false
+  chain_strategy: size-exception
+  decision_needed_before_apply: false
+
+# Chained PR units (review/cleanup — single PR)
+pr_units:
+  - unit: 1
+    description: Spec alignment + state coherence + logout doc + test refinements
+    target: main
+    status: pending

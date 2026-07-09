@@ -30,6 +30,30 @@ function renderApp(token: string | null = null) {
   );
 }
 
+function renderAppWithPath(path: string, token: string) {
+  return render(
+    <AuthContext.Provider
+      value={{
+        token,
+        user: {
+          id: 1,
+          numero_identificacion: "123",
+          first_name: "Test",
+          last_name: "User",
+          is_active: true,
+        },
+        login: vi.fn(),
+        logout: vi.fn(),
+        isLoading: false,
+      }}
+    >
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>
+    </AuthContext.Provider>,
+  );
+}
+
 describe("App routing", () => {
   it("should redirect to /login when no token", () => {
     renderApp(null);
@@ -40,6 +64,13 @@ describe("App routing", () => {
 
   it("should render authenticated layout when token exists", () => {
     renderApp("valid-token");
+    expect(
+      screen.getByText(/¡Bienvenido\/a, Test User!/i),
+    ).toBeInTheDocument();
+  });
+
+  it("should redirect authenticated user from /login to /", () => {
+    renderAppWithPath("/login", "valid-token");
     expect(
       screen.getByText(/¡Bienvenido\/a, Test User!/i),
     ).toBeInTheDocument();
