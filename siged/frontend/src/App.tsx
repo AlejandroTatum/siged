@@ -5,6 +5,8 @@ import { HomePage } from "./features/home/pages/HomePage";
 import { AuthenticatedLayout } from "./features/layout/pages/AuthenticatedLayout";
 import { InstitutionListPage } from "./features/instituciones/pages/InstitutionListPage";
 import { MyInstitutionsPage } from "./features/instituciones/pages/MyInstitutionsPage";
+import { PlanningPage } from "./features/planificacion/PlanningPage";
+import { InstitutionDashboardPage } from "./features/planificacion/pages/InstitutionDashboardPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -44,6 +46,8 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="instituciones" element={<InstitutionListPage />} />
         <Route path="mis-instituciones" element={<MyInstitutionsPage />} />
+        <Route path="instituciones/:institutionId" element={<InstitutionDashboardPage />} />
+        <Route path="instituciones/:institutionId/planificacion/:section" element={<PlanningPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
