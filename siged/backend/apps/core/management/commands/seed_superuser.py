@@ -9,8 +9,9 @@ Uso:
     python manage.py seed_superuser
 """
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 Usuario = get_user_model()
 
@@ -27,33 +28,48 @@ SUPERUSER_DATA = {
 
 
 class Command(BaseCommand):
-    help = "Crea el superusuario inicial del sistema SIGED"
+    help = "Crea o restablece el superusuario local documentado de SIGED"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help="Restablece los datos y la contraseña del administrador local.",
+        )
 
     def handle(self, *args, **options):
-        if Usuario.objects.filter(
+        if not settings.DEBUG:
+            raise CommandError(
+                "seed_superuser solo está disponible con DEBUG=True. "
+                "Use una provisión segura de credenciales en producción."
+            )
+
+        usuario = Usuario.objects.filter(
             numero_identificacion=SUPERUSER_DATA["numero_identificacion"]
-        ).exists():
+        ).first()
+        if usuario and not options["reset"]:
             self.stdout.write(
                 self.style.WARNING(
                     f"El superusuario '{SUPERUSER_DATA['numero_identificacion']}' "
-                    f"ya existe."
+                    "ya existe. Use --reset para restaurar las credenciales documentadas."
                 )
             )
             return
 
-        Usuario.objects.create_superuser(
-            numero_identificacion=SUPERUSER_DATA["numero_identificacion"],
-            password=SUPERUSER_DATA["password"],
-            is_superuser=SUPERUSER_DATA["is_superuser"],
-            is_staff=SUPERUSER_DATA["is_staff"],
-            is_active=SUPERUSER_DATA["is_active"],
-            first_name=SUPERUSER_DATA["first_name"],
-            last_name=SUPERUSER_DATA["last_name"],
-            email=SUPERUSER_DATA["email"],
-        )
+        if usuario:
+            for field, value in SUPERUSER_DATA.items():
+                if field != "password":
+                    setattr(usuario, field, value)
+            usuario.set_password(SUPERUSER_DATA["password"])
+            usuario.save()
+            action = "restablecido"
+        else:
+            Usuario.objects.create_superuser(**SUPERUSER_DATA)
+            action = "creado"
+
         self.stdout.write(
             self.style.SUCCESS(
                 f"Superusuario '{SUPERUSER_DATA['numero_identificacion']}' "
-                f"creado correctamente."
+                f"{action} correctamente."
             )
         )

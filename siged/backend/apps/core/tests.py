@@ -8,7 +8,9 @@ Cubre:
 """
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.core.management import call_command
+from django.core.management.base import CommandError
+from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
@@ -22,9 +24,15 @@ from apps.core.excepciones import (
     UsuarioInactivoError,
     UsuarioNoEncontradoError,
 )
+from apps.core.management.commands.seed_demo import (
+    DEMO_INSTITUTIONS,
+    DEMO_PASSWORD,
+    DEMO_USERS,
+)
 from apps.core.servicios.autenticacion_servicio import (
     AutenticacionServicio,
 )
+from apps.organizacion.models import Institucion, Rol, UsuarioRol
 
 Usuario = get_user_model()
 
@@ -32,6 +40,225 @@ Usuario = get_user_model()
 # =============================================================================
 # Tests unitarios
 # =============================================================================
+
+
+class UsuarioManagerTestCase(TestCase):
+    """Pruebas unitarias para UsuarioManager."""
+
+    def test_create_superuser_configura_credenciales_admin(self):
+        usuario = Usuario.objects.create_superuser(
+            numero_identificacion="000000001",
+            password="admin123",
+        )
+
+        self.assertTrue(usuario.is_active)
+        self.assertTrue(usuario.is_staff)
+        self.assertTrue(usuario.is_superuser)
+        self.assertTrue(usuario.check_password("admin123"))
+
+    def test_create_superuser_rechaza_staff_falso(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Superuser must have is_staff=True.",
+        ):
+            Usuario.objects.create_superuser(
+                numero_identificacion="000000001",
+                password="admin123",
+                is_staff=False,
+            )
+
+
+class SeedSuperuserCommandTestCase(TestCase):
+    """Pruebas del comando de configuración local del administrador."""
+
+    @override_settings(DEBUG=True)
+    def test_crea_administrador_documentado(self):
+        call_command("seed_superuser")
+
+        usuario = Usuario.objects.get(numero_identificacion="000000001")
+        self.assertEqual(usuario.email, "admin@example.com")
+        self.assertEqual(usuario.first_name, "Administrador")
+        self.assertEqual(usuario.last_name, "Sistema")
+        self.assertTrue(usuario.is_active)
+        self.assertTrue(usuario.is_staff)
+        self.assertTrue(usuario.is_superuser)
+        self.assertTrue(usuario.check_password("admin123"))
+
+    @override_settings(DEBUG=True)
+    def test_administrador_sembrado_y_restablecido_autentica(self):
+        call_command("seed_superuser")
+
+        self.assertTrue(
+            self.client.login(
+                numero_identificacion="000000001",
+                password="admin123",
+            )
+        )
+        self.client.logout()
+
+        usuario = Usuario.objects.get(numero_identificacion="000000001")
+        usuario.set_password("otra-clave")
+        usuario.save()
+
+        call_command("seed_superuser", "--reset")
+
+        self.assertTrue(
+            self.client.login(
+                numero_identificacion="000000001",
+                password="admin123",
+            )
+        )
+
+    @override_settings(DEBUG=True)
+    def test_administrador_existente_no_se_sobrescribe_sin_reset(self):
+        usuario = Usuario.objects.create_user(
+            numero_identificacion="000000001",
+            password="otra-clave",
+            email="old@example.com",
+        )
+
+        call_command("seed_superuser")
+
+        usuario.refresh_from_db()
+        self.assertEqual(usuario.email, "old@example.com")
+        self.assertTrue(usuario.check_password("otra-clave"))
+
+    @override_settings(DEBUG=True)
+    def test_reset_restaura_administrador_documentado(self):
+        usuario = Usuario.objects.create_user(
+            numero_identificacion="000000001",
+            password="otra-clave",
+            email="old@example.com",
+            first_name="Otro",
+            last_name="Usuario",
+            is_active=False,
+            is_staff=False,
+        )
+
+        call_command("seed_superuser", "--reset")
+
+        usuario.refresh_from_db()
+        self.assertEqual(usuario.email, "admin@example.com")
+        self.assertEqual(usuario.first_name, "Administrador")
+        self.assertEqual(usuario.last_name, "Sistema")
+        self.assertTrue(usuario.is_active)
+        self.assertTrue(usuario.is_staff)
+        self.assertTrue(usuario.is_superuser)
+        self.assertTrue(usuario.check_password("admin123"))
+
+    @override_settings(DEBUG=False)
+    def test_rechaza_credenciales_conocidas_fuera_de_desarrollo(self):
+        with self.assertRaises(CommandError):
+            call_command("seed_superuser")
+
+
+class SeedDemoCommandTestCase(TestCase):
+    @override_settings(DEBUG=False)
+    def test_rechaza_datos_demo_fuera_de_desarrollo(self):
+        with self.assertRaises(CommandError):
+            call_command("seed_demo")
+
+    @override_settings(DEBUG=True)
+    def test_primera_ejecucion_crea_demo_y_segunda_es_idempotente(self):
+        call_command("seed_demo")
+
+        self.assertEqual(
+            Usuario.objects.filter(
+                numero_identificacion__in=[row[0] for row in DEMO_USERS]
+            ).count(),
+            4,
+        )
+        self.assertEqual(
+            Institucion.objects.filter(
+                ruc__in=[row[2] for row in DEMO_INSTITUTIONS]
+            ).count(),
+            3,
+        )
+        self.assertEqual(UsuarioRol.objects.count(), 4)
+        codes = list(
+            Institucion.objects.order_by("codigo").values_list("codigo", flat=True)
+        )
+        self.assertEqual(codes, sorted(row[0] for row in DEMO_INSTITUTIONS))
+
+        call_command("seed_demo")
+
+        self.assertEqual(Usuario.objects.count(), 4)
+        self.assertEqual(Institucion.objects.count(), 3)
+        self.assertEqual(UsuarioRol.objects.count(), 4)
+        self.assertEqual(
+            list(
+                Institucion.objects.order_by("codigo").values_list(
+                    "codigo", flat=True
+                )
+            ),
+            codes,
+        )
+
+    @override_settings(DEBUG=True)
+    def test_rechaza_colision_de_ruc_con_codigo_o_nombre_distinto_antes_de_asignar_roles(self):
+        identification, first_name, last_name, _ = DEMO_USERS[0]
+        user = Usuario.objects.create_user(
+            numero_identificacion=identification,
+            password=DEMO_PASSWORD,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        codigo, name, ruc = DEMO_INSTITUTIONS[0]
+        institution = Institucion.objects.create(nombre=name, codigo="INST900", ruc=ruc)
+
+        with self.assertRaisesMessage(
+            CommandError,
+            f"El RUC demo {ruc} pertenece a una institución existente distinta.",
+        ):
+            call_command("seed_demo")
+
+        self.assertEqual(
+            Usuario.objects.get(numero_identificacion=identification).pk,
+            user.pk,
+        )
+        self.assertEqual(Institucion.objects.get(ruc=ruc).pk, institution.pk)
+        self.assertEqual(Institucion.objects.get(ruc=ruc).codigo, "INST900")
+        self.assertFalse(UsuarioRol.objects.filter(usuario=user).exists())
+        self.assertFalse(Rol.objects.exists())
+
+    @override_settings(DEBUG=True)
+    def test_rechaza_colision_de_ruc_con_nombre_distinto_antes_de_asignar_roles(self):
+        identification, first_name, last_name, _ = DEMO_USERS[0]
+        user = Usuario.objects.create_user(
+            numero_identificacion=identification,
+            password=DEMO_PASSWORD,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        codigo, _, ruc = DEMO_INSTITUTIONS[0]
+        institution = Institucion.objects.create(
+            nombre="Nombre ajeno", codigo=codigo, ruc=ruc
+        )
+
+        with self.assertRaisesMessage(
+            CommandError,
+            f"El RUC demo {ruc} pertenece a una institución existente distinta.",
+        ):
+            call_command("seed_demo")
+
+        self.assertEqual(Institucion.objects.get(ruc=ruc).pk, institution.pk)
+        self.assertFalse(UsuarioRol.objects.filter(usuario=user).exists())
+        self.assertFalse(Rol.objects.exists())
+
+    @override_settings(DEBUG=True)
+    def test_no_otorga_administracion_a_cuenta_preexistente_arbitraria(self):
+        identification = DEMO_USERS[0][0]
+        user = Usuario.objects.create_user(
+            numero_identificacion=identification,
+            password="private",
+        )
+
+        with self.assertRaises(CommandError):
+            call_command("seed_demo")
+
+        self.assertFalse(UsuarioRol.objects.filter(usuario=user).exists())
+        self.assertEqual(Usuario.objects.count(), 1)
+
 
 class LoginSerializerTestCase(TestCase):
     """Pruebas unitarias para LoginSerializer."""

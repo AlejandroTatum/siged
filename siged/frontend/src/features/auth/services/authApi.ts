@@ -9,6 +9,7 @@ import type {
   LoginRequest,
   LoginSuccessResponse,
   LogoutSuccessResponse,
+  ActiveRole,
 } from "@/features/auth/types/authTypes";
 import { ENDPOINTS } from "@/config/endpoints";
 
@@ -17,11 +18,11 @@ async function request<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const response = await fetch(url, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
     },
-    ...options,
   });
 
   const data = await response.json();
@@ -32,6 +33,12 @@ async function request<T>(
   }
 
   return data as T;
+}
+
+export async function getActiveRoles(tokenValue: string): Promise<ActiveRole[]> {
+  return request<ActiveRole[]>(ENDPOINTS.USER_ROLES, {
+    headers: { Authorization: `Token ${tokenValue}` },
+  });
 }
 
 export async function login(

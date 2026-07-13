@@ -7,7 +7,9 @@
  */
 
 import { useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { ROLE_ACADEMIC_AUTHORITY, ROLE_ADMINISTRATOR } from "@/config/app";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ interface SideMenuProps {
 export function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const { activeRoles } = useAuth();
+  const roleNames = new Set(activeRoles.map((role) => role.nombre));
 
   // Close sidebar when route changes
   useEffect(() => {
@@ -83,18 +87,26 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
 
         {/* Sidebar Navigation */}
         <nav className="mt-4">
-          <a
-            href="/"
+          <NavLink
+            to="/"
             className="flex items-center gap-4 px-6 py-5 transition-colors bg-sidebar-active hover:bg-sidebar-hover"
-            onClick={(e) => {
-              e.preventDefault();
-              onClose();
-              window.location.href = "/";
-            }}
+            onClick={onClose}
           >
             <span className="material-symbols-outlined text-3xl">home</span>
             <span className="text-[17px] font-bold">Menú principal</span>
-          </a>
+          </NavLink>
+          {roleNames.has(ROLE_ADMINISTRATOR) && (
+            <NavLink to="/instituciones" onClick={onClose} className="flex items-center gap-4 px-6 py-5 transition-colors hover:bg-sidebar-hover">
+              <span className="material-symbols-outlined text-3xl">account_balance</span>
+              <span className="text-[17px] font-bold">Instituciones</span>
+            </NavLink>
+          )}
+          {roleNames.has(ROLE_ACADEMIC_AUTHORITY) && (
+            <NavLink to="/mis-instituciones" onClick={onClose} className="flex items-center gap-4 px-6 py-5 transition-colors hover:bg-sidebar-hover">
+              <span className="material-symbols-outlined text-3xl">domain</span>
+              <span className="text-[17px] font-bold">Mis instituciones</span>
+            </NavLink>
+          )}
         </nav>
       </aside>
     </div>

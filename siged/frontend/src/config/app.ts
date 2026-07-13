@@ -8,3 +8,7 @@
 export const app_name = "SIGED";
 
 export const app_full_name = "Sistema de Información y Gestión Educativa";
+
+export const ROLE_ADMINISTRATOR = "ADMINISTRADOR";
+
+export const ROLE_ACADEMIC_AUTHORITY = "AUTORIDAD_ACADEMICA";

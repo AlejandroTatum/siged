@@ -11,6 +11,7 @@ function renderTopBar(onToggleSidebar?: () => void) {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <AuthContext.Provider
       value={{
+        activeRoles: [],
         token: "token-123",
         user: {
           id: 1,

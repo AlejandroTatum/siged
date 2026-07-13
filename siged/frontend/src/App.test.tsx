@@ -9,6 +9,7 @@ function renderApp(token: string | null = null) {
     <AuthContext.Provider
       value={{
         token,
+        activeRoles: [],
         user: token
           ? {
               id: 1,
@@ -35,6 +36,7 @@ function renderAppWithPath(path: string, token: string) {
     <AuthContext.Provider
       value={{
         token,
+        activeRoles: [],
         user: {
           id: 1,
           numero_identificacion: "123",

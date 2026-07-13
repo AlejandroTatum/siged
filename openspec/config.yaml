@@ -13,7 +13,7 @@ review_budget: 400
 # Stack
 stack:
   backend: Django 4.x + Django REST Framework + SQLite + pytest-django
-  frontend: Vite + React 18 + TypeScript + Tailwind CSS + Vitest
+  frontend: Vite 6 + React 19 + TypeScript 5.7 + Tailwind CSS 4 + Vitest 2
   dev_harness: scripts/dev.sh
 
 # Testing
@@ -24,10 +24,22 @@ testing:
     coverage: true
     paths:
       - siged/backend/apps/core/tests/
+      - siged/backend/apps/organizacion/tests/
   frontend:
     runner: vitest
     command: cd siged/frontend && npm test -- --coverage
     coverage: true
+    layers:
+      unit: true
+      integration: true
+      e2e: false
+  quality:
+    backend_linter: null
+    backend_type_checker: null
+    backend_formatter: null
+    frontend_linter: null
+    frontend_type_checker: cd siged/frontend && npm run build
+    frontend_formatter: null
 
 strict_tdd: true
 

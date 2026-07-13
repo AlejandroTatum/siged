@@ -21,6 +21,9 @@ from apps.core.excepciones import (
 from apps.core.servicios.autenticacion_servicio import (
     AutenticacionServicio,
 )
+from apps.core.apis.serializers.usuario_serializer import UsuarioSerializer
+from apps.core.servicios.usuario_servicio import UsuarioServicio
+from apps.organizacion.permisos import EsAdministradorActivo
 
 
 @api_view(["POST"])
@@ -85,3 +88,11 @@ def logout_view(request):
         {"mensaje": "Sesión cerrada correctamente"},
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["GET"])
+@permission_classes([EsAdministradorActivo])
+def usuarios_view(request):
+    activo_param = request.query_params.get("activo")
+    activo = None if activo_param is None else activo_param.lower() == "true"
+    return Response(UsuarioSerializer(UsuarioServicio.listar(activo), many=True).data)

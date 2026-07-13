@@ -90,3 +90,6 @@ Como Autoridad académica, deseo acceder únicamente a las instituciones educati
 - **Usuario**: Representa a una persona registrada en el sistema susceptible de tener uno o más roles.
 - **Rol**: Representa el tipo de rol que puede asumir un usuario dentro del sistema, tales como `ADMINISTRADOR`, `AUTORIDAD_ACADEMICA`, `DOCENTE`, `SECRETARIA`, `ESTUDIANTE` y `DECE`. En esta funcionalidad, interesan especialmente `ADMINISTRADOR` y `AUTORIDAD_ACADEMICA`.
 - **UsuarioRol**: Representa la asignación de un rol a un usuario y, cuando el rol lo requiere, su vinculación con una institución educativa. En esta funcionalidad, dicha vinculación es obligatoria para el rol de `AUTORIDAD_ACADEMICA`.
+## Addendum approved after contract-gap discovery (2026-07-11)
+
+This addendum did not exist in the original teacher source. The user approved administrator-only `GET /api/roles/`, returning `{id, nombre}`, solely so the frontend can resolve `AUTORIDAD_ACADEMICA` by name and submit its actual database ID. Clients MUST NOT hardcode or infer role IDs.
