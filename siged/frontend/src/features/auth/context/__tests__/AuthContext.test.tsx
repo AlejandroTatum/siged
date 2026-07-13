@@ -94,6 +94,20 @@ describe("AuthContext", () => {
     expect(getActiveRoles).toHaveBeenCalledWith("test-token-123");
   });
 
+  it("does not enter bootstrap loading while login credentials are being checked", async () => {
+    let resolveLogin: (value: unknown) => void = () => undefined;
+    (apiLogin as ReturnType<typeof vi.fn>).mockImplementation(
+      () => new Promise((resolve) => { resolveLogin = resolve; }),
+    );
+
+    render(<AuthProvider><TestConsumer /></AuthProvider>);
+    fireEvent.click(screen.getByTestId("login-btn"));
+
+    expect(screen.getByTestId("loading")).toHaveTextContent("false");
+    resolveLogin({ token: "token", usuario: { id: 1 } });
+    await waitFor(() => expect(screen.getByTestId("token")).toHaveTextContent("token"));
+  });
+
   it("hydrates distinct active roles when a stored session is reloaded", async () => {
     localStorage.setItem("authToken", "stored-token");
     (getActiveRoles as ReturnType<typeof vi.fn>).mockResolvedValue([
