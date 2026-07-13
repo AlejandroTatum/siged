@@ -9,7 +9,10 @@ import { PlanningPage } from "./features/planificacion/PlanningPage";
 import { InstitutionDashboardPage } from "./features/planificacion/pages/InstitutionDashboardPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth();
+  const { isLoading, token } = useAuth();
+  if (isLoading) {
+    return <p role="status">Validating session...</p>;
+  }
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -17,7 +20,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth();
+  const { isLoading, token } = useAuth();
+  if (isLoading) {
+    return <p role="status">Validating session...</p>;
+  }
   if (token) {
     return <Navigate to="/" replace />;
   }

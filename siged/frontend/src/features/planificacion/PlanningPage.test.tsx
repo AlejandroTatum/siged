@@ -7,8 +7,11 @@ import { planningApi } from "./api";
 import { PlanningPage } from "./PlanningPage";
 
 const page = (results: object[]) => ({ count: results.length, next: null, previous: null, results });
-const level = { id: 3, nombre: "General", carga_horaria_minima_semanal: 30,
-  subniveles: [{ id: 4, nombre: "Básica", carga_horaria_minima_semanal: 35 }] };
+const level = { id: 3, nombre: "General", pp_minutos: 40, pp_semana_minimo: 30,
+  subniveles: [{ id: 4, nombre: "Básica", pp_semana_minimo: 35 }] };
+const grade = { id: 8, nombre: "First", orden: 1, nivel: { id: 3, nombre: "General" },
+  subnivel: { id: 4, nombre: "Básica" }, carga_pedagogica_actual: 20,
+  carga_pedagogica_minima: 35, alerta_carga_pedagogica: true };
 
 function renderPage(path = "/instituciones/1/planificacion/planes") {
   return render(<AuthContext.Provider value={{ token: "token", user: null, activeRoles: [], login: vi.fn(), logout: vi.fn(), isLoading: false }}>
@@ -63,7 +66,7 @@ describe("PlanningPage", () => {
     vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(new Response(JSON.stringify([level]), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(page([
-        { id: 8, nombre: "First", orden: 1, nivel: 3, subnivel: 4, carga_horaria_actual: 0, carga_horaria_minima: 35, alerta_carga_horaria: true },
+        grade,
       ])), { status: 200 }));
     renderPage("/instituciones/1/planificacion/grados?plan=7");
     expect(await screen.findByRole("link", { name: "Manage subjects for First" })).toHaveAttribute(
@@ -116,11 +119,22 @@ describe("PlanningPage", () => {
   it("uses catalog selects for grades and shows refreshed load alerts", async () => {
     vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(new Response(JSON.stringify([level]), { status: 200 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify(page([{ id: 5, nombre: "First", orden: 1, nivel: 3, subnivel: 4, carga_horaria_actual: 20, carga_horaria_minima: 35, alerta_carga_horaria: true }])), { status: 200 }));
+      .mockResolvedValueOnce(new Response(JSON.stringify(page([grade])), { status: 200 }));
     renderPage("/instituciones/1/planificacion/grados?plan=2");
     expect(await screen.findByRole("alert")).toHaveTextContent("20 / 35");
     expect(screen.getByLabelText("Level")).toHaveTextContent("General");
     expect(screen.getByLabelText("Sublevel")).toHaveTextContent("Básica");
+  });
+
+  it("hydrates grade edit selects from nested serializer objects", async () => {
+    vi.spyOn(planningApi, "levels").mockResolvedValue([level]);
+    vi.spyOn(planningApi, "grades").mockResolvedValue(page([grade]) as never);
+
+    renderPage("/instituciones/1/planificacion/grados?plan=2");
+    fireEvent.click(await screen.findByRole("button", { name: "Edit First" }));
+
+    expect(screen.getByLabelText("Level")).toHaveValue("3");
+    expect(screen.getByLabelText("Sublevel")).toHaveValue("4");
   });
 
   it("keeps the required sublevel blank until the user selects one", async () => {
@@ -137,9 +151,9 @@ describe("PlanningPage", () => {
 
   it("creates a grade after a middle deletion with the next unused order", async () => {
     const grades = [
-      { id: 1, nombre: "First", orden: 1, nivel: 3, subnivel: 4 },
-      { id: 2, nombre: "Second", orden: 2, nivel: 3, subnivel: 4 },
-      { id: 3, nombre: "Third", orden: 3, nivel: 3, subnivel: 4 },
+      { ...grade, id: 1, nombre: "First", orden: 1 },
+      { ...grade, id: 2, nombre: "Second", orden: 2 },
+      { ...grade, id: 3, nombre: "Third", orden: 3 },
     ];
     vi.spyOn(planningApi, "levels").mockResolvedValue([level]);
     vi.spyOn(planningApi, "grades")
@@ -160,53 +174,49 @@ describe("PlanningPage", () => {
     await waitFor(() => expect(createGrade).toHaveBeenCalledWith("token", 2, expect.objectContaining({ orden: 4 })));
   });
 
-  it("creates a subject after a middle deletion with the next unused order", async () => {
-    const subjects = [
-      { id: 1, nombre: "Math", orden: 1, carga_horaria_semanal: 5 },
-      { id: 2, nombre: "Science", orden: 2, carga_horaria_semanal: 4 },
-      { id: 3, nombre: "History", orden: 3, carga_horaria_semanal: 3 },
-    ];
-    vi.spyOn(planningApi, "subjects")
-      .mockResolvedValueOnce(page(subjects) as never)
-      .mockResolvedValue(page([subjects[0]!, subjects[2]!]) as never);
-    vi.spyOn(planningApi, "remove").mockResolvedValue(undefined);
-    const createSubject = vi.spyOn(planningApi, "createSubject").mockResolvedValue(subjects[2] as never);
-    vi.spyOn(planningApi, "grade").mockResolvedValue({ alerta_carga_horaria: false } as never);
-    vi.spyOn(globalThis, "confirm").mockReturnValue(true);
-
-    renderPage("/instituciones/1/planificacion/asignaturas?grado=4");
-    fireEvent.click(await screen.findByRole("button", { name: "Delete Science" }));
-    await waitFor(() => expect(screen.queryByText("Science")).not.toBeInTheDocument());
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Geography" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save subject" }));
-
-    await waitFor(() => expect(createSubject).toHaveBeenCalledWith("token", 4, expect.objectContaining({ orden: 4 })));
-  });
-
-  it("creates a subject and refreshes subjects and grade alert", async () => {
+  it("loads the subject array and creates with the canonical payload", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(new Response(JSON.stringify(page([])), { status: 200 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ carga_horaria_actual: 0, carga_horaria_minima: 30, alerta_carga_horaria: true }), { status: 200 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 9, nombre: "Math" }), { status: 201 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify(page([{ id: 9, nombre: "Math", orden: 1, carga_horaria_semanal: 5 }])), { status: 200 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ carga_horaria_actual: 5, carga_horaria_minima: 30, alerta_carga_horaria: true }), { status: 200 }));
+      .mockResolvedValueOnce(new Response(JSON.stringify([{ id: 8, nombre: "Science", pp_semana_minimo: 4 }]), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...grade, carga_pedagogica_actual: 4 }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 9, nombre: "Math", pp_semana_minimo: 5, grado_escolar: 4 }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify([{ id: 8, nombre: "Science", pp_semana_minimo: 4 }, { id: 9, nombre: "Math", pp_semana_minimo: 5 }]), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...grade, carga_pedagogica_actual: 9 }), { status: 200 }));
     renderPage("/instituciones/1/planificacion/asignaturas?grado=4");
-    await screen.findByText("No subjects found.");
+    await screen.findByText("Science");
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Math" } });
     fireEvent.change(screen.getByLabelText("Weekly load"), { target: { value: "5" } });
     fireEvent.click(screen.getByRole("button", { name: "Save subject" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("5 / 30");
+    expect(await screen.findByText("Math")).toBeInTheDocument();
+    expect(JSON.parse(fetchMock.mock.calls[2]![1]!.body as string)).toEqual({
+      nombre: "Math", pp_semana_minimo: 5, grado_escolar: 4,
+    });
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(5));
   });
 
+  it("updates a subject with only canonical editable fields", async () => {
+    const subject = { id: 9, nombre: "Math", pp_semana_minimo: 5 };
+    vi.spyOn(planningApi, "subjects").mockResolvedValue([subject]);
+    vi.spyOn(planningApi, "grade").mockResolvedValue(grade);
+    const update = vi.spyOn(planningApi, "update").mockResolvedValue(subject);
+
+    renderPage("/instituciones/1/planificacion/asignaturas?grado=4");
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Math" }));
+    fireEvent.change(screen.getByLabelText("Weekly load"), { target: { value: "6" } });
+    fireEvent.click(screen.getByRole("button", { name: "Update subject" }));
+
+    await waitFor(() => expect(update).toHaveBeenCalledWith("token", "asignaturas", 9, {
+      nombre: "Math", pp_semana_minimo: 6,
+    }));
+  });
+
   it("shows and refreshes the grade alert when the grade has no subjects", async () => {
-    const subjects = [{ id: 9, nombre: "Math", orden: 1, carga_horaria_semanal: 5 }];
+    const subjects = [{ id: 9, nombre: "Math", pp_semana_minimo: 5 }];
     vi.spyOn(planningApi, "subjects")
-      .mockResolvedValueOnce(page(subjects) as never)
-      .mockResolvedValueOnce(page([]) as never);
+      .mockResolvedValueOnce(subjects)
+      .mockResolvedValueOnce([]);
     vi.spyOn(planningApi, "grade")
-      .mockResolvedValueOnce({ carga_horaria_actual: 5, carga_horaria_minima: 30, alerta_carga_horaria: true } as never)
-      .mockResolvedValueOnce({ carga_horaria_actual: 0, carga_horaria_minima: 30, alerta_carga_horaria: true } as never);
+      .mockResolvedValueOnce({ ...grade, carga_pedagogica_actual: 5, carga_pedagogica_minima: 30 } as never)
+      .mockResolvedValueOnce({ ...grade, carga_pedagogica_actual: 0, carga_pedagogica_minima: 30 } as never);
     vi.spyOn(planningApi, "remove").mockResolvedValue(undefined);
     vi.spyOn(globalThis, "confirm").mockReturnValue(true);
 

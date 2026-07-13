@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import App from "@/App";
 import { AuthContext } from "@/features/auth/context/AuthContext";
 
-function renderApp(token: string | null = null) {
+function renderApp(token: string | null = null, isLoading = false) {
   return render(
     <AuthContext.Provider
       value={{
@@ -21,7 +21,7 @@ function renderApp(token: string | null = null) {
           : null,
         login: vi.fn(),
         logout: vi.fn(),
-        isLoading: false,
+        isLoading,
       }}
     >
       <MemoryRouter initialEntries={["/"]}>
@@ -69,6 +69,12 @@ describe("App routing", () => {
     expect(
       screen.getByText(/¡Bienvenido\/a, Test User!/i),
     ).toBeInTheDocument();
+  });
+
+  it("does not render protected routes before stored auth validation finishes", () => {
+    renderApp("stored-token", true);
+    expect(screen.getByRole("status")).toHaveTextContent("Validating session...");
+    expect(screen.queryByText(/¡Bienvenido\/a/i)).not.toBeInTheDocument();
   });
 
   it("should redirect authenticated user from /login to /", () => {

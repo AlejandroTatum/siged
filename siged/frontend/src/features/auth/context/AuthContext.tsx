@@ -41,21 +41,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UsuarioResponse | null>(
     () => getStoredUser<UsuarioResponse>(),
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(() => Boolean(getStoredToken()));
   const [activeRoles, setActiveRoles] = useState<ActiveRole[]>([]);
 
   useEffect(() => {
     if (!token) {
       setActiveRoles([]);
+      setIsLoading(false);
       return;
     }
     let isCurrent = true;
     getActiveRoles(token)
       .then((roles) => {
-        if (isCurrent) setActiveRoles(roles);
+        if (isCurrent) {
+          setActiveRoles(roles);
+          setIsLoading(false);
+        }
       })
-      .catch(() => {
-        if (isCurrent) setActiveRoles([]);
+      .catch((error: unknown) => {
+        if (!isCurrent) return;
+        if (typeof error === "object" && error !== null && "status" in error && error.status === 401) {
+          clearStoredAuth();
+          setToken(null);
+          setUser(null);
+          setActiveRoles([]);
+        }
+        setIsLoading(false);
       });
     return () => { isCurrent = false; };
   }, [token]);

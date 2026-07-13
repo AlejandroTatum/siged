@@ -2,6 +2,8 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { AuthProvider, AuthContext } from "@/features/auth/context/AuthContext";
 import { useContext } from "react";
+import { MemoryRouter } from "react-router-dom";
+import App from "@/App";
 
 // Mock the api module
 vi.mock("@/features/auth/services/authApi", () => ({
@@ -103,6 +105,42 @@ describe("AuthContext", () => {
 
     await waitFor(() => expect(screen.getByTestId("roles")).toHaveTextContent("ADMINISTRADOR,AUTORIDAD_ACADEMICA"));
     expect(getActiveRoles).toHaveBeenCalledWith("stored-token");
+  });
+
+  it("clears a stored session only when bootstrap is definitively unauthorized", async () => {
+    localStorage.setItem("authToken", "stale-token");
+    localStorage.setItem("authUser", JSON.stringify({ id: 1 }));
+    (getActiveRoles as ReturnType<typeof vi.fn>).mockRejectedValue({ status: 401 });
+
+    render(<AuthProvider><TestConsumer /></AuthProvider>);
+
+    expect(screen.getByTestId("loading")).toHaveTextContent("true");
+    await waitFor(() => expect(screen.getByTestId("token")).toHaveTextContent("null"));
+    expect(localStorage.getItem("authToken")).toBeNull();
+    expect(localStorage.getItem("authUser")).toBeNull();
+    expect(screen.getByTestId("loading")).toHaveTextContent("false");
+  });
+
+  it("redirects a protected route to login after stale-token bootstrap", async () => {
+    localStorage.setItem("authToken", "stale-token");
+    (getActiveRoles as ReturnType<typeof vi.fn>).mockRejectedValue({ status: 401 });
+
+    render(<AuthProvider><MemoryRouter initialEntries={["/"]}><App /></MemoryRouter></AuthProvider>);
+
+    expect(screen.getByRole("status")).toHaveTextContent("Validating session...");
+    expect(await screen.findByText(/ingrese sus credenciales/i)).toBeInTheDocument();
+    expect(localStorage.getItem("authToken")).toBeNull();
+  });
+
+  it("keeps stored auth after a transient bootstrap failure", async () => {
+    localStorage.setItem("authToken", "stored-token");
+    (getActiveRoles as ReturnType<typeof vi.fn>).mockRejectedValue(new TypeError("Network error"));
+
+    render(<AuthProvider><TestConsumer /></AuthProvider>);
+
+    await waitFor(() => expect(screen.getByTestId("loading")).toHaveTextContent("false"));
+    expect(screen.getByTestId("token")).toHaveTextContent("stored-token");
+    expect(localStorage.getItem("authToken")).toBe("stored-token");
   });
 
   it("should clear state on logout", async () => {

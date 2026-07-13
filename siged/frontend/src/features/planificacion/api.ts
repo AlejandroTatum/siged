@@ -18,7 +18,7 @@ export const planningApi = {
   createPlan: (token: string, institutionId: number, data: object) => post<Plan>(ENDPOINTS.PLANS, token, { ...data, institucion: institutionId }),
   grades: (token: string, planId: number, query = "") => request<Page<Grade>>(`${ENDPOINTS.PLAN_GRADES(planId)}${query}`, token),
   createGrade: (token: string, planId: number, data: object) => post<Grade>(ENDPOINTS.GRADES, token, { ...data, plan_estudio: planId }),
-  subjects: (token: string, gradeId: number) => request<Page<Subject>>(ENDPOINTS.GRADE_SUBJECTS(gradeId), token),
+  subjects: (token: string, gradeId: number) => request<Subject[]>(ENDPOINTS.GRADE_SUBJECTS(gradeId), token),
   createSubject: (token: string, gradeId: number, data: object) => post<Subject>(ENDPOINTS.SUBJECTS, token, { ...data, grado_escolar: gradeId }),
   grade: (token: string, gradeId: number) => request<Grade>(ENDPOINTS.GRADE(gradeId), token),
   update: <T>(token: string, section: string, id: number, data: object) => request<T>(resourceUrl(section, id), token, { method: "PATCH", body: JSON.stringify(data) }),
