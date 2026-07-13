@@ -6,6 +6,21 @@
 
 Este archivo establece lineamientos generales para la ejecución de tareas por agentes para la implementación del proyecto **SIGED**.  
 
+## Modo de entrega académica local
+
+SIGED se desarrolla como un proyecto académico. Los specs entregados por el docente son la autoridad funcional y de seguridad.
+
+Durante la implementación de una feature:
+
+- no se deben crear PRs ni cadenas de PRs;
+- no se deben exigir receipts, review gates ni provenance de Gentle AI;
+- no se deben aplicar controles de entrega orientados a producción que no formen parte de los specs;
+- la verificación obligatoria consiste en migraciones, pruebas de backend, pruebas de frontend, build y aceptación manual contra el spec;
+- una feature se considera terminada solo cuando esa evidencia académica está en verde;
+- después de verificar la feature, los cambios se organizan en commits convencionales, sin atribución de IA.
+
+Las PRs, revisiones adversariales y validaciones de Gentle AI son opcionales y solo se ejecutan cuando el usuario las solicita explícitamente. Este modo simplifica el proceso de entrega; no permite omitir requisitos funcionales, pruebas relevantes, autorización, aislamiento de datos ni otras exigencias de seguridad definidas por los specs.
+
 ## Tecnologías activas
 
 - **Backend:** Python 3.11

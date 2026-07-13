@@ -7,8 +7,6 @@ execution_mode: auto
 artifact_store:
   mode: openspec
   root: openspec/
-chained_pr_strategy: auto-forecast
-review_budget: 400
 
 # Stack
 stack:
