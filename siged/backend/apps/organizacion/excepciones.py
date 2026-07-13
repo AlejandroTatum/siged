@@ -1,0 +1,2 @@
+class InstitucionConAsignacionesActivas(Exception):
+    pass

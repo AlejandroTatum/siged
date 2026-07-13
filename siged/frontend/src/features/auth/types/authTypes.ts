@@ -38,9 +38,16 @@ export interface LogoutSuccessResponse {
   mensaje: string;
 }
 
+export interface ActiveRole {
+  id: number;
+  nombre: string;
+  nombre_display: string;
+}
+
 // ─── Context ───────────────────────────────────────────────────
 
 export interface AuthContextValue {
+  activeRoles: ActiveRole[];
   token: string | null;
   user: UsuarioResponse | null;
   login: (credentials: LoginRequest) => Promise<LoginSuccessResponse>;

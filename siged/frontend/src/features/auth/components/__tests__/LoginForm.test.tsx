@@ -11,6 +11,7 @@ function renderLoginForm(onSuccess?: () => void) {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <AuthContext.Provider
       value={{
+        activeRoles: [],
         token: null,
         user: null,
         login: mockLogin,

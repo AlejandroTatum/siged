@@ -5,11 +5,12 @@ import { useContext } from "react";
 
 // Mock the api module
 vi.mock("@/features/auth/services/authApi", () => ({
+  getActiveRoles: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
 }));
 
-import { login as apiLogin, logout as apiLogout } from "@/features/auth/services/authApi";
+import { getActiveRoles, login as apiLogin, logout as apiLogout } from "@/features/auth/services/authApi";
 
 function TestConsumer() {
   const context = useContext(AuthContext);
@@ -22,6 +23,7 @@ function TestConsumer() {
         {context.user ? JSON.stringify(context.user) : "null"}
       </div>
       <div data-testid="loading">{context.isLoading ? "true" : "false"}</div>
+      <div data-testid="roles">{context.activeRoles.map((role) => role.nombre).join(",")}</div>
       <button
         data-testid="login-btn"
         onClick={() =>
@@ -44,6 +46,7 @@ describe("AuthContext", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    (getActiveRoles as ReturnType<typeof vi.fn>).mockResolvedValue([]);
   });
 
   it("should provide initial null state", () => {
@@ -69,6 +72,9 @@ describe("AuthContext", () => {
       },
     };
     (apiLogin as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse);
+    (getActiveRoles as ReturnType<typeof vi.fn>).mockResolvedValue([
+      { id: 1, nombre: "ADMINISTRADOR", nombre_display: "Administrador" },
+    ]);
 
     render(
       <AuthProvider>
@@ -82,6 +88,21 @@ describe("AuthContext", () => {
       expect(screen.getByTestId("token").textContent).toBe("test-token-123");
     });
     expect(localStorage.getItem("authToken")).toBe("test-token-123");
+    await waitFor(() => expect(screen.getByTestId("roles")).toHaveTextContent("ADMINISTRADOR"));
+    expect(getActiveRoles).toHaveBeenCalledWith("test-token-123");
+  });
+
+  it("hydrates distinct active roles when a stored session is reloaded", async () => {
+    localStorage.setItem("authToken", "stored-token");
+    (getActiveRoles as ReturnType<typeof vi.fn>).mockResolvedValue([
+      { id: 1, nombre: "ADMINISTRADOR", nombre_display: "Administrador" },
+      { id: 2, nombre: "AUTORIDAD_ACADEMICA", nombre_display: "Autoridad académica" },
+    ]);
+
+    render(<AuthProvider><TestConsumer /></AuthProvider>);
+
+    await waitFor(() => expect(screen.getByTestId("roles")).toHaveTextContent("ADMINISTRADOR,AUTORIDAD_ACADEMICA"));
+    expect(getActiveRoles).toHaveBeenCalledWith("stored-token");
   });
 
   it("should clear state on logout", async () => {
@@ -117,6 +138,7 @@ describe("AuthContext", () => {
       expect(screen.getByTestId("token").textContent).toBe("null");
     });
     expect(localStorage.getItem("authToken")).toBeNull();
+    expect(screen.getByTestId("roles")).toHaveTextContent("");
   });
 
 });

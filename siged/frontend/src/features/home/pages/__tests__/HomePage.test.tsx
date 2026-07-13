@@ -7,6 +7,7 @@ function renderHome() {
   return render(
     <AuthContext.Provider
       value={{
+        activeRoles: [],
         token: "token-123",
         user: {
           id: 1,

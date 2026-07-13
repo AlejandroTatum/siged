@@ -11,16 +11,19 @@ import {
   useCallback,
   useMemo,
   useState,
+  useEffect,
 } from "react";
 import type {
   AuthContextValue,
   LoginRequest,
   LoginSuccessResponse,
   UsuarioResponse,
+  ActiveRole,
 } from "@/features/auth/types/authTypes";
 import {
   login as apiLogin,
   logout as apiLogout,
+  getActiveRoles,
 } from "@/features/auth/services/authApi";
 import {
   clearStoredAuth,
@@ -39,6 +42,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => getStoredUser<UsuarioResponse>(),
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [activeRoles, setActiveRoles] = useState<ActiveRole[]>([]);
+
+  useEffect(() => {
+    if (!token) {
+      setActiveRoles([]);
+      return;
+    }
+    let isCurrent = true;
+    getActiveRoles(token)
+      .then((roles) => {
+        if (isCurrent) setActiveRoles(roles);
+      })
+      .catch(() => {
+        if (isCurrent) setActiveRoles([]);
+      });
+    return () => { isCurrent = false; };
+  }, [token]);
 
   const login = useCallback(
     async (credentials: LoginRequest): Promise<LoginSuccessResponse> => {
@@ -70,13 +90,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearStoredAuth();
       setToken(null);
       setUser(null);
+      setActiveRoles([]);
       setIsLoading(false);
     }
   }, [token]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ token, user, login, logout, isLoading }),
-    [token, user, login, logout, isLoading],
+    () => ({ activeRoles, token, user, login, logout, isLoading }),
+    [activeRoles, token, user, login, logout, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
