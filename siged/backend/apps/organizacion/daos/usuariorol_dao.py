@@ -3,6 +3,15 @@ from apps.organizacion.models import Rol, UsuarioRol
 
 class UsuarioRolDAO:
     @staticmethod
+    def es_autoridad_academica_activa(usuario, institucion_id):
+        return UsuarioRol.objects.filter(
+            usuario=usuario,
+            rol__nombre=Rol.AUTORIDAD_ACADEMICA,
+            institucion_id=institucion_id,
+            es_activo=True,
+        ).exists()
+
+    @staticmethod
     def actualizar(asignacion, datos):
         for campo, valor in datos.items():
             setattr(asignacion, campo, valor)
