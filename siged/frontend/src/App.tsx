@@ -7,6 +7,7 @@ import { InstitutionListPage } from "./features/instituciones/pages/InstitutionL
 import { MyInstitutionsPage } from "./features/instituciones/pages/MyInstitutionsPage";
 import { PlanningPage } from "./features/planificacion/PlanningPage";
 import { InstitutionDashboardPage } from "./features/planificacion/pages/InstitutionDashboardPage";
+import { ROLE_ACADEMIC_AUTHORITY, ROLE_ADMINISTRATOR } from "@/config/app";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoading, token } = useAuth();
@@ -15,6 +16,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   if (!token) {
     return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+}
+
+function RequireRole({ role, children }: { role: string; children: React.ReactNode }) {
+  const { activeRoles } = useAuth();
+  const roleNames = new Set(activeRoles.map((r) => r.nombre));
+  if (!roleNames.has(role)) {
+    return <Navigate to="/" replace />;
   }
   return <>{children}</>;
 }
@@ -50,8 +60,22 @@ export default function App() {
         }
       >
         <Route index element={<HomePage />} />
-        <Route path="instituciones" element={<InstitutionListPage />} />
-        <Route path="mis-instituciones" element={<MyInstitutionsPage />} />
+        <Route
+          path="instituciones"
+          element={
+            <RequireRole role={ROLE_ADMINISTRATOR}>
+              <InstitutionListPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="mis-instituciones"
+          element={
+            <RequireRole role={ROLE_ACADEMIC_AUTHORITY}>
+              <MyInstitutionsPage />
+            </RequireRole>
+          }
+        />
         <Route path="instituciones/:institutionId" element={<InstitutionDashboardPage />} />
         <Route path="instituciones/:institutionId/planificacion/:section" element={<PlanningPage />} />
       </Route>

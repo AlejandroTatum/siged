@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import App from "@/App";
 import { AuthContext } from "@/features/auth/context/AuthContext";
@@ -31,12 +31,16 @@ function renderApp(token: string | null = null, isLoading = false) {
   );
 }
 
-function renderAppWithPath(path: string, token: string) {
+function renderAppWithPath(
+  path: string,
+  token: string,
+  activeRoles: { id: number; nombre: string; nombre_display: string }[] = [],
+) {
   return render(
     <AuthContext.Provider
       value={{
         token,
-        activeRoles: [],
+        activeRoles,
         user: {
           id: 1,
           numero_identificacion: "123",
@@ -57,6 +61,24 @@ function renderAppWithPath(path: string, token: string) {
 }
 
 describe("App routing", () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        const isPaginatedList = url.includes("/api/instituciones/?");
+        return {
+          ok: true,
+          status: 200,
+          json: async () =>
+            isPaginatedList
+              ? { count: 0, next: null, previous: null, results: [] }
+              : [],
+        };
+      }),
+    );
+  });
+
   it("should redirect to /login when no token", () => {
     renderApp(null);
     expect(
@@ -82,5 +104,34 @@ describe("App routing", () => {
     expect(
       screen.getByText(/¡Bienvenido\/a, Test User!/i),
     ).toBeInTheDocument();
+  });
+
+  it("redirects an authenticated user without ADMINISTRADOR away from /instituciones", () => {
+    renderAppWithPath("/instituciones", "valid-token", []);
+    expect(
+      screen.getByText(/¡Bienvenido\/a, Test User!/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Gestión de instituciones educativas/i)).not.toBeInTheDocument();
+  });
+
+  it("allows a user with ADMINISTRADOR to access /instituciones", () => {
+    renderAppWithPath("/instituciones", "valid-token", [
+      { id: 1, nombre: "ADMINISTRADOR", nombre_display: "Administrador" },
+    ]);
+    expect(screen.getByText(/Gestión de instituciones educativas/i)).toBeInTheDocument();
+  });
+
+  it("redirects an authenticated user without AUTORIDAD_ACADEMICA away from /mis-instituciones", () => {
+    renderAppWithPath("/mis-instituciones", "valid-token", []);
+    expect(
+      screen.getByText(/¡Bienvenido\/a, Test User!/i),
+    ).toBeInTheDocument();
+  });
+
+  it("allows a user with AUTORIDAD_ACADEMICA to access /mis-instituciones", () => {
+    renderAppWithPath("/mis-instituciones", "valid-token", [
+      { id: 2, nombre: "AUTORIDAD_ACADEMICA", nombre_display: "Autoridad académica" },
+    ]);
+    expect(screen.queryByText(/¡Bienvenido\/a, Test User!/i)).not.toBeInTheDocument();
   });
 });
