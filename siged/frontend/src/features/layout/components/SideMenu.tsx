@@ -22,6 +22,7 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const { activeRoles } = useAuth();
   const roleNames = new Set(activeRoles.map((role) => role.nombre));
   const institutionId = location.pathname.match(/^\/instituciones\/(\d+)/)?.[1];
+  const isInstitutionalContext = Boolean(institutionId) && roleNames.has(ROLE_ACADEMIC_AUTHORITY);
 
   // Close sidebar when route changes
   useEffect(() => {
@@ -88,7 +89,7 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
 
         {/* Sidebar Navigation */}
         <nav className="mt-4">
-          {institutionId ? <>
+          {isInstitutionalContext ? <>
           <NavLink to="/" onClick={onClose} className="flex items-center gap-4 px-6 py-5 transition-colors hover:bg-sidebar-hover"><span className="material-symbols-outlined">arrow_back</span><span>Volver al menú principal</span></NavLink>
           <NavLink to={`/instituciones/${institutionId}`} onClick={onClose} className="flex items-center gap-4 px-6 py-5 transition-colors hover:bg-sidebar-hover"><span className="material-symbols-outlined">school</span><span>Mi institución</span></NavLink>
           <NavLink to={`/instituciones/${institutionId}/planificacion/planes`} onClick={onClose} className="flex items-center gap-4 px-6 py-5 transition-colors hover:bg-sidebar-hover"><span className="material-symbols-outlined">menu_book</span><span>Planes de estudio</span></NavLink>
