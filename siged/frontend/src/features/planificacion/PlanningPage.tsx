@@ -78,7 +78,7 @@ export function PlanningPage() {
       ? [
           ["nombre", "Nombre (A–Z)"],
           ["-nombre", "Nombre (Z–A)"],
-          ["es_activo", "Estado"],
+          ["es_activo", "Estado ascendente"],
           ["-es_activo", "Estado descendente"],
         ]
       : [
