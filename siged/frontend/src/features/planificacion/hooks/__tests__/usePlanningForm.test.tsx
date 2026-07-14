@@ -27,6 +27,54 @@ afterEach(() => {
 });
 
 describe("usePlanningForm", () => {
+  it("separates field validation errors from non-field errors for every planning form", async () => {
+    vi.spyOn(planningApi, "createGrade").mockRejectedValue(Object.assign(new Error("No fue posible guardar el registro."), {
+      status: 400,
+      data: {
+        nombre: ["Este nombre ya existe."],
+        nivel: ["Selecciona un nivel válido."],
+        orden: ["El orden ya está ocupado."],
+        non_field_errors: ["El grado no es válido para este plan."],
+      },
+    }));
+    const { result } = renderHook(() => usePlanningForm({ ...baseOptions }));
+    act(() => {
+      result.current.setField("name", "Cuarto");
+      result.current.setField("order", "1");
+      result.current.setLevel("3");
+      result.current.setField("sublevelId", "4");
+    });
+
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(result.current.fieldErrors).toEqual({
+      nombre: ["Este nombre ya existe."],
+      nivel: ["Selecciona un nivel válido."],
+      orden: ["El orden ya está ocupado."],
+    });
+    expect(result.current.error).toBe("El grado no es válido para este plan.");
+  });
+
+  it("shows a generic global error for an unstructured failure", async () => {
+    vi.spyOn(planningApi, "createGrade").mockRejectedValue("network failure");
+    const { result } = renderHook(() => usePlanningForm({ ...baseOptions }));
+    act(() => {
+      result.current.setField("name", "Cuarto");
+      result.current.setField("order", "1");
+      result.current.setLevel("3");
+      result.current.setField("sublevelId", "4");
+    });
+
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    expect(result.current.error).toBe("No fue posible guardar el registro.");
+    expect(result.current.fieldErrors).toEqual({});
+  });
+
   it("creates a grade and resets the draft", async () => {
     const spy = vi.spyOn(planningApi, "createGrade").mockResolvedValue(grade as never);
     const { result } = renderHook(() => usePlanningForm({ ...baseOptions }));

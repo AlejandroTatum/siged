@@ -1,8 +1,8 @@
 /**
  * Hook: usePlanningData
  *
- * Carga los datos de la sección activa (planes, grados, asignaturas o
- * catálogo) y mantiene paginación, búsqueda, orden y estado de carga.
+ * Carga los datos de la sección activa (planes, grados o asignaturas)
+ * y mantiene paginación, búsqueda, orden y estado de carga.
  * El componente sólo consume el resultado: la página no realiza fetch
  * directo ni mantiene useState relacionado con la carga.
  */
@@ -94,8 +94,6 @@ export function usePlanningData({ token, institutionId, section, parentId, allow
         const grade = await planningApi.grade(token, parentId);
         setItems(data);
         setGradeAlert(grade);
-      } else if (section === "catalogo") {
-        setLevels(await planningApi.levels(token));
       }
       setStatus(LOAD_STATUS.SUCCESS);
     } catch (caught) {

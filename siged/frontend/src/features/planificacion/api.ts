@@ -1,12 +1,27 @@
 import { ENDPOINTS } from "@/config/endpoints";
 import type { Grade, Level, Page, Plan, Subject } from "./types";
 
+export type PlanningApiErrors = Record<string, string | string[]>;
+
+export class PlanningApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly data: PlanningApiErrors,
+  ) {
+    super(message);
+    this.name = "PlanningApiError";
+  }
+}
+
 async function request<T>(url: string, token: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(url, { ...options, headers: { "Content-Type": "application/json", Authorization: `Token ${token}` } });
   const data = response.status === 204 ? null : await response.json();
   if (!response.ok) {
-    const detail = (data as { detail?: string }).detail ?? (Object.values(data as Record<string, string[]>).flat().join(" ") || "Planning request failed");
-    throw Object.assign(new Error(detail), { status: response.status });
+    const errors = data && typeof data === "object" ? data as PlanningApiErrors : {};
+    const detail = errors.detail;
+    const message = typeof detail === "string" ? detail : "No fue posible completar la solicitud de planificación.";
+    throw new PlanningApiError(message, response.status, errors);
   }
   return data as T;
 }

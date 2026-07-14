@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useState } from "react";
-import { planningApi } from "../api";
+import { PlanningApiError, planningApi, type PlanningApiErrors } from "../api";
 import type { PlanningItem } from "../planItem";
 import type { Level } from "../types";
 
@@ -44,6 +44,7 @@ export interface UsePlanningFormResult {
   status: FormStatus;
   notice: string;
   error: string;
+  fieldErrors: Record<string, string[]>;
   sublevels: { id: number; nombre: string; pp_semana_minimo: number }[];
   setField: <K extends keyof FormDraft>(key: K, value: FormDraft[K]) => void;
   setLevel: (value: string) => void;
@@ -62,12 +63,33 @@ const EMPTY_DRAFT: FormDraft = {
   order: "",
 };
 
+const GLOBAL_ERROR_KEYS = new Set(["detail", "non_field_errors"]);
+
+function errorMessages(value: string | string[] | undefined): string[] {
+  if (typeof value === "string") return [value];
+  return Array.isArray(value) ? value.filter((message): message is string => typeof message === "string") : [];
+}
+
+function splitApiErrors(caught: unknown, fallback: string): { error: string; fieldErrors: Record<string, string[]> } {
+  if (!(caught instanceof PlanningApiError) && !(caught instanceof Error && "data" in caught)) {
+    return { error: caught instanceof Error ? caught.message : fallback, fieldErrors: {} };
+  }
+  const data = (caught as Error & { data?: PlanningApiErrors }).data ?? {};
+  const fieldErrors: Record<string, string[]> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (!GLOBAL_ERROR_KEYS.has(key)) fieldErrors[key] = errorMessages(value);
+  }
+  const globalMessages = [...errorMessages(data.detail), ...errorMessages(data.non_field_errors)];
+  return { error: globalMessages.join(" "), fieldErrors };
+}
+
 export function usePlanningForm({ token, section, institutionId, parentId, items, levels, reload }: UsePlanningFormOptions): UsePlanningFormResult {
   const [draft, setDraft] = useState<FormDraft>(EMPTY_DRAFT);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [status, setStatus] = useState<FormStatus>(FORM_STATUS.IDLE);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const setField = useCallback(<K extends keyof FormDraft>(key: K, value: FormDraft[K]) => {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -81,6 +103,7 @@ export function usePlanningForm({ token, section, institutionId, parentId, items
     setEditingId(null);
     setDraft(EMPTY_DRAFT);
     setError("");
+    setFieldErrors({});
   }, []);
 
   const edit = useCallback((item: PlanningItem) => {
@@ -94,6 +117,7 @@ export function usePlanningForm({ token, section, institutionId, parentId, items
       order: "orden" in item ? String(item.orden) : "",
     });
     setError("");
+    setFieldErrors({});
     setNotice("");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -102,6 +126,7 @@ export function usePlanningForm({ token, section, institutionId, parentId, items
     if (!token) return false;
     setStatus(FORM_STATUS.BUSY);
     setError("");
+    setFieldErrors({});
     setNotice("");
     try {
       const { name, active, levelId, sublevelId, weeklyLoad, order } = draft;
@@ -145,7 +170,9 @@ export function usePlanningForm({ token, section, institutionId, parentId, items
       await reload();
       return true;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "No fue posible guardar el registro.");
+      const parsed = splitApiErrors(caught, "No fue posible guardar el registro.");
+      setError(parsed.error);
+      setFieldErrors(parsed.fieldErrors);
       return false;
     } finally {
       setStatus(FORM_STATUS.IDLE);
@@ -171,5 +198,5 @@ export function usePlanningForm({ token, section, institutionId, parentId, items
   const selectedLevel = levels.find((level) => level.id === selectedLevelId);
   const sublevels = selectedLevel?.subniveles ?? [];
 
-  return { draft, editingId, status, notice, error, sublevels, setField, setLevel, edit, reset, submit, remove };
+  return { draft, editingId, status, notice, error, fieldErrors, sublevels, setField, setLevel, edit, reset, submit, remove };
 }

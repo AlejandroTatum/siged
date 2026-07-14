@@ -83,7 +83,7 @@ export function PlanningTable({ institutionId, items, onDelete, onEdit, section,
               {"pp_semana_minimo" in item && <td className="px-5 py-4">{item.pp_semana_minimo} períodos</td>}
               <td className="px-5 py-4">
                 <div className="flex justify-end gap-2">
-                  {section === "planes" && (
+                  {section === "planes" && "es_activo" in item && (
                     <Link
                       aria-label={`Gestionar grados de ${item.nombre}`}
                       title="Gestionar grados"

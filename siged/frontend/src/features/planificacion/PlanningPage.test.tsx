@@ -77,14 +77,6 @@ describe("PlanningPage", () => {
     );
   });
 
-  it("loads the read-only level catalog inside institution context", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([level]), { status: 200 }));
-    renderPage("/instituciones/1/planificacion/catalogo");
-    expect(await screen.findByText("General")).toBeInTheDocument();
-    expect(screen.getByText("Básica")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /guardar/i })).not.toBeInTheDocument();
-  });
-
   it("creates a plan and reloads the list", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(new Response(JSON.stringify(page([])), { status: 200 }))
@@ -97,6 +89,20 @@ describe("PlanningPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Guardar plan" }));
     expect(await screen.findByText("Plan 2026")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("shows the backend conflict when another plan is active", async () => {
+    const inactive = { id: 7, nombre: "Plan 2026", es_activo: false };
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify(page([inactive])), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ detail: "Ya existe otro plan activo para esta institución." }), { status: 409 }));
+
+    renderPage();
+    fireEvent.click(await screen.findByRole("button", { name: "Editar Plan 2026" }));
+    fireEvent.click(screen.getByLabelText("Plan activo"));
+    fireEvent.click(screen.getByRole("button", { name: "Actualizar plan" }));
+
+    expect(await screen.findByTestId("planning-form-error")).toHaveTextContent("Ya existe otro plan activo para esta institución.");
   });
 
   it("updates and deletes planning records through confirmed actions", async () => {

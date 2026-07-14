@@ -15,7 +15,6 @@ describe("PlanningNavigation", () => {
   it("renders the planes tab as clickable and disables Grados/Asignaturas when no parent is selected", () => {
     renderNav(1, 0, "planes");
     expect(screen.getByRole("link", { name: "Planes de estudio" })).toHaveAttribute("href", "/instituciones/1/planificacion/planes");
-    expect(screen.getByRole("link", { name: "Catálogo educativo" })).toHaveAttribute("href", "/instituciones/1/planificacion/catalogo");
   });
 
   it("disables Grados and Asignaturas when there is no parent plan or grade", () => {

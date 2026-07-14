@@ -146,6 +146,38 @@ describe("PlanningForm", () => {
     expect(screen.getByLabelText(/^Carga semanal mínima/)).toHaveValue(3);
   });
 
+  it("renders each backend validation error beside its corresponding control", () => {
+    render(
+      <PlanningForm
+        active={false}
+        busy={false}
+        editing={false}
+        fieldErrors={{ nombre: ["Este nombre ya existe."], nivel: ["Nivel inválido."], subnivel: ["Subnivel inválido."], orden: ["Orden ocupado."] }}
+        levelId="3"
+        levels={[level]}
+        name="Cuarto"
+        onActiveChange={vi.fn()}
+        onCancel={vi.fn()}
+        onLevelChange={vi.fn()}
+        onNameChange={vi.fn()}
+        onOrderChange={vi.fn()}
+        onSubmit={vi.fn()}
+        onSublevelChange={vi.fn()}
+        onWeeklyLoadChange={vi.fn()}
+        order="1"
+        section="grados"
+        sublevelId="4"
+        sublevels={level.subniveles}
+        weeklyLoad="1"
+      />,
+    );
+
+    expect(screen.getByLabelText(/^Nombre/)).toHaveAccessibleDescription("Este nombre ya existe.");
+    expect(screen.getByLabelText(/^Nivel educativo/)).toHaveAccessibleDescription("Nivel inválido.");
+    expect(screen.getByLabelText(/^Subnivel/)).toHaveAccessibleDescription("Subnivel inválido.");
+    expect(screen.getByLabelText(/^Orden/)).toHaveAccessibleDescription("Orden ocupado.");
+  });
+
   it("renders a loading state with polite live region while the catalog is being fetched", () => {
     render(
       <PlanningForm

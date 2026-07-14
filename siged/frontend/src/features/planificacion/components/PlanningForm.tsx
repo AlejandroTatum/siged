@@ -32,6 +32,7 @@ interface PlanningFormProps {
    * `role="alert"` so screen readers announce it immediately.
    */
   error?: string;
+  fieldErrors?: Record<string, string[]>;
   /**
    * Optional retry handler surfaced when `error` is present. The
    * button is hidden when the error is purely a client validation
@@ -46,6 +47,10 @@ export function PlanningForm(props: PlanningFormProps) {
   const noun = props.section === "planes" ? "plan" : props.section === "grados" ? "grado" : "asignatura";
   const loading = props.loading === true;
   const error = props.error ?? "";
+  const fieldErrors = props.fieldErrors ?? {};
+  const fieldError = (key: string) => fieldErrors[key]?.join(" ") ?? "";
+  const describedBy = (key: string) => fieldError(key) ? `planning-${key}-error` : undefined;
+  const errorText = (key: string) => fieldError(key) && <span id={`planning-${key}-error`} className="mt-1 block font-normal text-danger">{fieldError(key)}</span>;
   const empty = props.section === "grados" && !loading && props.levels.length === 0 && !props.editing;
 
   if (loading) {
@@ -95,21 +100,21 @@ export function PlanningForm(props: PlanningFormProps) {
             )}
           </div>
         )}
-        <label className="text-sm font-bold text-text-body">Nombre <span className="text-danger">*</span><input required value={props.name} onChange={(event) => props.onNameChange(event.target.value)} className={fieldClass} /></label>
-        {props.section === "planes" && <label className="mt-7 flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 text-sm font-bold"><input type="checkbox" checked={props.active} onChange={(event) => props.onActiveChange(event.target.checked)} className="size-4 accent-primary" />Plan activo</label>}
+        <label className="text-sm font-bold text-text-body">Nombre <span className="text-danger">*</span><input required aria-invalid={Boolean(fieldError("nombre"))} aria-describedby={describedBy("nombre")} value={props.name} onChange={(event) => props.onNameChange(event.target.value)} className={fieldClass} />{errorText("nombre")}</label>
+        {props.section === "planes" && <label className="mt-7 flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 text-sm font-bold"><input type="checkbox" checked={props.active} aria-invalid={Boolean(fieldError("es_activo"))} aria-describedby={describedBy("es_activo")} onChange={(event) => props.onActiveChange(event.target.checked)} className="size-4 accent-primary" />Plan activo{errorText("es_activo")}</label>}
         {props.section === "grados" && (
           <>
             <label className="text-sm font-bold">Nivel educativo <span className="text-danger">*</span>
-              <select required value={props.levelId} onChange={(event) => props.onLevelChange(event.target.value)} className={fieldClass}>
+              <select required aria-invalid={Boolean(fieldError("nivel"))} aria-describedby={describedBy("nivel")} value={props.levelId} onChange={(event) => props.onLevelChange(event.target.value)} className={fieldClass}>
                 <option value="">Selecciona un nivel</option>
                 {props.levels.map((level) => <option key={level.id} value={level.id}>{level.nombre}</option>)}
-              </select>
+              </select>{errorText("nivel")}
             </label>
             <label className="text-sm font-bold">Subnivel <span className="text-danger">*</span>
-              <select required={props.sublevels.length > 0} disabled={!props.sublevels.length} value={props.sublevelId} onChange={(event) => props.onSublevelChange(event.target.value)} className={fieldClass}>
+              <select required={props.sublevels.length > 0} disabled={!props.sublevels.length} aria-invalid={Boolean(fieldError("subnivel"))} aria-describedby={describedBy("subnivel")} value={props.sublevelId} onChange={(event) => props.onSublevelChange(event.target.value)} className={fieldClass}>
                 <option value="">Selecciona un subnivel</option>
                 {props.sublevels.map((sublevel) => <option key={sublevel.id} value={sublevel.id}>{sublevel.nombre}</option>)}
-              </select>
+              </select>{errorText("subnivel")}
             </label>
             <label className="text-sm font-bold">Orden <span className="text-danger">*</span>
               <input
@@ -117,19 +122,21 @@ export function PlanningForm(props: PlanningFormProps) {
                 min="1"
                 step="1"
                 required
+                aria-invalid={Boolean(fieldError("orden"))}
+                aria-describedby={describedBy("orden")}
                 value={props.order}
                 onChange={(event) => props.onOrderChange(event.target.value)}
                 className={fieldClass}
-              />
+              />{errorText("orden")}
             </label>
           </>
         )}
         {props.section === "asignaturas" && (
           <label className="text-sm font-bold">Carga semanal mínima <span className="text-danger">*</span>
             <div className="relative">
-              <input type="number" min="1" required value={props.weeklyLoad} onChange={(event) => props.onWeeklyLoadChange(event.target.value)} className={`${fieldClass} pr-24`} />
+              <input type="number" min="1" required aria-invalid={Boolean(fieldError("pp_semana_minimo"))} aria-describedby={describedBy("pp_semana_minimo")} value={props.weeklyLoad} onChange={(event) => props.onWeeklyLoadChange(event.target.value)} className={`${fieldClass} pr-24`} />
               <span className="absolute bottom-2.5 right-3 text-sm text-text-muted">períodos</span>
-            </div>
+            </div>{errorText("pp_semana_minimo")}
           </label>
         )}
         <div className="flex flex-wrap justify-end gap-3 md:col-span-2">

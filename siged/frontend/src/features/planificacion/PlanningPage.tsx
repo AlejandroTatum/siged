@@ -1,7 +1,6 @@
 import { type FormEvent } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { EducationCatalog } from "./components/EducationCatalog";
 import { PlanningForm } from "./components/PlanningForm";
 import { PlanningNavigation } from "./components/PlanningNavigation";
 import { PlanningTable } from "./components/PlanningTable";
@@ -10,12 +9,11 @@ import { usePlanningData } from "./hooks/usePlanningData";
 import { usePlanningForm } from "./hooks/usePlanningForm";
 import type { PlanningItem } from "./planItem";
 
-const SECTIONS = ["planes", "grados", "asignaturas", "catalogo"] as const;
+const SECTIONS = ["planes", "grados", "asignaturas"] as const;
 const SECTION_CONTENT = {
   planes: { title: "Planes de estudio", subtitle: "Define y administra la estructura curricular de la institución.", icon: "menu_book" },
   grados: { title: "Grados escolares", subtitle: "Organiza los grados, niveles y subniveles del plan seleccionado.", icon: "school" },
   asignaturas: { title: "Asignaturas", subtitle: "Gestiona las asignaturas y su carga pedagógica semanal.", icon: "auto_stories" },
-  catalogo: { title: "Catálogo educativo", subtitle: "Consulta los niveles y subniveles oficiales disponibles.", icon: "category" },
 } as const;
 
 type Section = (typeof SECTIONS)[number];
@@ -106,7 +104,7 @@ export function PlanningPage() {
   const onOrderChange = (value: string) => form.setField("order", value);
   const onCancel = () => form.reset();
 
-  const totalRecords = currentSection === "catalogo" ? data.levels.length : data.pageData.count || data.items.length;
+  const totalRecords = data.pageData.count || data.items.length;
 
   return (
     <main className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
@@ -162,32 +160,31 @@ export function PlanningPage() {
         </div>
       )}
 
-      {currentSection !== "catalogo" && (
-        <PlanningForm
-          active={form.draft.active}
-          busy={form.status === "busy"}
-          editing={form.editingId !== null}
-          levelId={form.draft.levelId}
-          levels={data.levels}
-          loading={currentSection === "grados" && data.status === "loading"}
-          name={form.draft.name}
-          onActiveChange={onActiveChange}
-          onCancel={onCancel}
-          onLevelChange={form.setLevel}
-          onNameChange={onNameChange}
-          onOrderChange={onOrderChange}
-          onSubmit={onSubmit}
-          onSublevelChange={onSublevelChange}
-          onWeeklyLoadChange={onWeeklyLoadChange}
-          order={form.draft.order}
-          section={currentSection}
-          sublevelId={form.draft.sublevelId}
-          sublevels={form.sublevels}
-          weeklyLoad={form.draft.weeklyLoad}
-          error={form.error || (data.status === "error" && currentSection === "grados" ? data.error : "")}
-          onRetry={data.status === "error" ? () => void data.reload() : undefined}
-        />
-      )}
+      <PlanningForm
+        active={form.draft.active}
+        busy={form.status === "busy"}
+        editing={form.editingId !== null}
+        levelId={form.draft.levelId}
+        levels={data.levels}
+        loading={currentSection === "grados" && data.status === "loading"}
+        name={form.draft.name}
+        onActiveChange={onActiveChange}
+        onCancel={onCancel}
+        onLevelChange={form.setLevel}
+        onNameChange={onNameChange}
+        onOrderChange={onOrderChange}
+        onSubmit={onSubmit}
+        onSublevelChange={onSublevelChange}
+        onWeeklyLoadChange={onWeeklyLoadChange}
+        order={form.draft.order}
+        section={currentSection}
+        sublevelId={form.draft.sublevelId}
+        sublevels={form.sublevels}
+        weeklyLoad={form.draft.weeklyLoad}
+        error={form.error || (data.status === "error" && currentSection === "grados" ? data.error : "")}
+        fieldErrors={form.fieldErrors}
+        onRetry={data.status === "error" ? () => void data.reload() : undefined}
+      />
 
       {(currentSection === "planes" || currentSection === "grados") && (
         <section aria-label="Herramientas de listado" className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm sm:flex-row">
@@ -216,25 +213,16 @@ export function PlanningPage() {
         </section>
       )}
 
-      {currentSection === "catalogo" ? (
-        <EducationCatalog
-          levels={data.levels}
-          loading={data.status === "loading"}
-          error={data.status === "error" ? data.error : ""}
-          onRetry={() => void data.reload()}
-        />
-      ) : (
-        <PlanningTable
-          institutionId={id}
-          items={data.items}
-          onDelete={onDelete}
-          onEdit={onEdit}
-          section={currentSection}
-          loading={data.status === "loading"}
-          error={data.status === "error" ? data.error : ""}
-          onRetry={() => void data.reload()}
-        />
-      )}
+      <PlanningTable
+        institutionId={id}
+        items={data.items}
+        onDelete={onDelete}
+        onEdit={onEdit}
+        section={currentSection}
+        loading={data.status === "loading"}
+        error={data.status === "error" ? data.error : ""}
+        onRetry={() => void data.reload()}
+      />
 
       {(currentSection === "planes" || currentSection === "grados") && (
         <nav aria-label="Paginación" className="flex flex-col items-center justify-between gap-3 rounded-xl border border-border bg-surface px-5 py-4 text-sm sm:flex-row">

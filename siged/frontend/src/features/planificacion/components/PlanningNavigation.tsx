@@ -50,14 +50,6 @@ export function PlanningNavigation({ institutionId, parentId, section }: Plannin
       disabled: !hasGrade,
       disabledReason: "Selecciona un grado escolar para gestionar sus asignaturas.",
     },
-    {
-      icon: "category",
-      label: "Catálogo educativo",
-      to: `/instituciones/${institutionId}/planificacion/catalogo`,
-      active: section === "catalogo",
-      disabled: false,
-      disabledReason: "",
-    },
   ];
 
   return (
