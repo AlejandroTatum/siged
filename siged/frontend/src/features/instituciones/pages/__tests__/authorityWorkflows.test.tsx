@@ -48,18 +48,23 @@ describe("academic authority assignment workflows", () => {
     fireEvent.click(screen.getByRole("button", { name: "Guardar" }));
     await waitFor(() => expect(institutionLoads).toBe(2));
     expect(fetch).toHaveBeenCalledWith("/api/usuarioroles/", expect.objectContaining({ method: "POST", body: JSON.stringify({ usuario: 4, rol: 77, institucion: 1 }) }));
+    await screen.findByText("Autoridad académica agregada exitosamente.");
 
     fireEvent.click(screen.getByRole("button", { name: "Editar" }));
     expect(await screen.findByRole("option", { name: /Ana Paz/ })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: /Eva Sol/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Guardar" }));
     await waitFor(() => expect(institutionLoads).toBe(3));
+    await screen.findByText("Autoridad académica actualizada exitosamente.");
     fireEvent.click(screen.getByRole("button", { name: "Desactivar" }));
     await waitFor(() => expect(institutionLoads).toBe(4));
+    await screen.findByText("Autoridad académica desactivada exitosamente.");
     fireEvent.click(screen.getByRole("button", { name: "Activar" }));
     await waitFor(() => expect(institutionLoads).toBe(5));
+    await screen.findByText("Autoridad académica activada exitosamente.");
     fireEvent.click(screen.getByRole("button", { name: "Eliminar" }));
     await waitFor(() => expect(institutionLoads).toBe(6));
+    await screen.findByText("Asignación eliminada exitosamente.");
   });
 
   it("presents the documented mutation error and handles the rejection", async () => {
@@ -107,6 +112,31 @@ describe("academic authority assignment workflows", () => {
       window.removeEventListener("unhandledrejection", unhandled);
     },
   );
+
+  it("shows a validation message and skips the API call when saving without selecting a user", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL, options?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/api/instituciones/?")) return response({ count: 1, next: null, previous: null, results: [institution] });
+      if (url === "/api/roles/") return response([{ id: 77, nombre: "AUTORIDAD_ACADEMICA" }]);
+      if (url.includes("/api/usuarioroles/?institucion=")) return response([]);
+      if (url === "/api/usuarios/?activo=true") return response([{ id: 4, username: "active", first_name: "Eva", last_name: "Sol" }]);
+      if (url === "/api/usuarioroles/" && options?.method === "POST") throw new Error("should not be called");
+      throw new Error(`Unexpected request ${options?.method ?? "GET"} ${url}`);
+    }));
+
+    mount();
+    await screen.findByText("Escuela Uno");
+    fireEvent.click(screen.getByText("Gestionar"));
+    fireEvent.click(screen.getByRole("button", { name: "Agregar autoridad" }));
+    await screen.findByLabelText("Usuario");
+
+    const postCallsBefore = vi.mocked(fetch).mock.calls.filter(([, options]) => options?.method === "POST").length;
+    fireEvent.click(screen.getByRole("button", { name: "Guardar" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Selecciona un usuario.");
+    const postCallsAfter = vi.mocked(fetch).mock.calls.filter(([, options]) => options?.method === "POST").length;
+    expect(postCallsAfter).toBe(postCallsBefore);
+  });
 
   it("presents a stable error when loading authority users is rejected", async () => {
     const unhandled = vi.fn();

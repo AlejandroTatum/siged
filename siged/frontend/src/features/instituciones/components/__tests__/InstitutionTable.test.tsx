@@ -21,6 +21,7 @@ describe("InstitutionTable", () => {
 				 onDelete={vi.fn()}
 				 onEdit={vi.fn()}
 				 onSort={vi.fn()}
+				 ordering="nombre"
 			 />,
 		 );
 
@@ -49,6 +50,7 @@ describe("InstitutionTable", () => {
         onDelete={onDelete}
         onEdit={onEdit}
         onSort={vi.fn()}
+        ordering="nombre"
       />,
     );
 
@@ -62,5 +64,47 @@ describe("InstitutionTable", () => {
     fireEvent.click(remove);
     expect(onEdit).toHaveBeenCalledWith(institution);
     expect(onDelete).toHaveBeenCalledWith(institution);
+  });
+
+  it("marks the ascending active column with an up arrow and aria-sort", () => {
+    render(
+      <InstitutionTable
+        items={[institution]}
+        onAuthorities={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onSort={vi.fn()}
+        ordering="nombre"
+      />,
+    );
+
+    const nombreHeader = screen.getByRole("columnheader", { name: /Nombre de la institución/ });
+    expect(nombreHeader).toHaveAttribute("aria-sort", "ascending");
+    expect(nombreHeader.querySelector(".material-symbols-outlined")).toHaveTextContent("arrow_upward");
+
+    const codigoHeader = screen.getByRole("columnheader", { name: /Código de institución/ });
+    expect(codigoHeader).toHaveAttribute("aria-sort", "none");
+    expect(codigoHeader.querySelector(".material-symbols-outlined")).toHaveTextContent("unfold_more");
+  });
+
+  it("marks the descending active column with a down arrow and aria-sort", () => {
+    render(
+      <InstitutionTable
+        items={[institution]}
+        onAuthorities={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onSort={vi.fn()}
+        ordering="-codigo"
+      />,
+    );
+
+    const codigoHeader = screen.getByRole("columnheader", { name: /Código de institución/ });
+    expect(codigoHeader).toHaveAttribute("aria-sort", "descending");
+    expect(codigoHeader.querySelector(".material-symbols-outlined")).toHaveTextContent("arrow_downward");
+
+    const nombreHeader = screen.getByRole("columnheader", { name: /Nombre de la institución/ });
+    expect(nombreHeader).toHaveAttribute("aria-sort", "none");
+    expect(nombreHeader.querySelector(".material-symbols-outlined")).toHaveTextContent("unfold_more");
   });
 });
