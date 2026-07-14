@@ -54,6 +54,7 @@ class UsuarioRolSerializer(serializers.ModelSerializer):
         institucion = attrs.get("institucion", getattr(instance, "institucion", None))
         if rol and rol.nombre == Rol.AUTORIDAD_ACADEMICA and institucion is None:
             raise serializers.ValidationError({"institucion": ["Este campo es obligatorio para el rol AUTORIDAD_ACADEMICA."]})
-        if UsuarioRolDAO.existe_activa(usuario, rol, institucion, instance.pk if instance else None):
+        es_activo = getattr(instance, "es_activo", True)
+        if es_activo and UsuarioRolDAO.existe_activa(usuario, rol, institucion, instance.pk if instance else None):
             raise serializers.ValidationError("Ya existe una asignación activa para este usuario, rol e institución.")
         return attrs

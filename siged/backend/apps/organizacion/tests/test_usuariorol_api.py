@@ -82,3 +82,27 @@ class TestUsuarioRolApi:
         assert response.json() == {"non_field_errors": ["Ya existe una asignación activa para este usuario, rol e institución."]}
         inactive.refresh_from_db()
         assert inactive.es_activo is False
+
+    def test_editing_an_inactive_assignment_does_not_trigger_duplicate_active_check(self):
+        UsuarioRol.objects.create(usuario=self.user, rol=self.authority_role, institucion=self.institution)
+        typo_user = Usuario.objects.create_user("typo", password="x")
+        inactive = UsuarioRol.objects.create(usuario=typo_user, rol=self.authority_role, institucion=self.institution, es_activo=False)
+
+        response = self.client.patch(f"/api/usuarioroles/{inactive.id}/", {"usuario": self.user.id}, format="json")
+
+        assert response.status_code == 200
+        inactive.refresh_from_db()
+        assert inactive.es_activo is False
+        assert inactive.usuario_id == self.user.id
+
+    def test_editing_an_active_assignment_still_rejects_an_existing_active_combination(self):
+        UsuarioRol.objects.create(usuario=self.user, rol=self.authority_role, institucion=self.institution)
+        other_user = Usuario.objects.create_user("other", password="x")
+        active = UsuarioRol.objects.create(usuario=other_user, rol=self.authority_role, institucion=self.institution, es_activo=True)
+
+        response = self.client.patch(f"/api/usuarioroles/{active.id}/", {"usuario": self.user.id}, format="json")
+
+        assert response.status_code == 400
+        assert response.json() == {"non_field_errors": ["Ya existe una asignación activa para este usuario, rol e institución."]}
+        active.refresh_from_db()
+        assert active.usuario_id == other_user.id
