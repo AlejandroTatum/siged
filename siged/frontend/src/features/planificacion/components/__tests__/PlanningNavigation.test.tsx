@@ -3,10 +3,10 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { PlanningNavigation } from "../PlanningNavigation";
 
-function renderNav(institutionId: number, parentId: number, section: string) {
+function renderNav(institutionId: number, parentId: number, section: string, planId: number | null = null) {
   return render(
     <MemoryRouter>
-      <PlanningNavigation institutionId={institutionId} parentId={parentId} section={section} />
+      <PlanningNavigation institutionId={institutionId} parentId={parentId} section={section} planId={planId} />
     </MemoryRouter>,
   );
 }
@@ -35,6 +35,16 @@ describe("PlanningNavigation", () => {
   it("enables Asignaturas with the grade id when the user is in the asignaturas section", () => {
     renderNav(1, 4, "asignaturas");
     expect(screen.getByRole("link", { name: "Asignaturas" })).toHaveAttribute("href", "/instituciones/1/planificacion/asignaturas?grado=4");
+  });
+
+  it("disables Grados in the asignaturas section until the owning plan id is known", () => {
+    renderNav(1, 4, "asignaturas");
+    expect(screen.getByTestId("nav-disabled-grados")).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("enables Grados with the owning plan id once it is known in the asignaturas section", () => {
+    renderNav(1, 4, "asignaturas", 7);
+    expect(screen.getByRole("link", { name: "Grados" })).toHaveAttribute("href", "/instituciones/1/planificacion/grados?plan=7");
   });
 
   it("marks the active section with aria-current page", () => {

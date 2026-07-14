@@ -4,6 +4,7 @@ interface PlanningNavigationProps {
   institutionId: number;
   parentId: number;
   section: string;
+  planId?: number | null;
 }
 
 interface NavLink {
@@ -15,10 +16,10 @@ interface NavLink {
   disabledReason: string;
 }
 
-export function PlanningNavigation({ institutionId, parentId, section }: PlanningNavigationProps) {
-  const hasPlan = section === "grados" && parentId > 0;
+export function PlanningNavigation({ institutionId, parentId, section, planId = null }: PlanningNavigationProps) {
+  const gradesPlanId = section === "grados" ? parentId : planId;
+  const hasPlan = Boolean(gradesPlanId && gradesPlanId > 0);
   const hasGrade = section === "asignaturas" && parentId > 0;
-  const planId = hasPlan ? parentId : null;
   const gradoId = hasGrade ? parentId : null;
 
   const links: NavLink[] = [
@@ -34,7 +35,7 @@ export function PlanningNavigation({ institutionId, parentId, section }: Plannin
       icon: "school",
       label: "Grados",
       to: hasPlan
-        ? `/instituciones/${institutionId}/planificacion/grados?plan=${planId ?? ""}`
+        ? `/instituciones/${institutionId}/planificacion/grados?plan=${gradesPlanId ?? ""}`
         : null,
       active: section === "grados",
       disabled: !hasPlan,

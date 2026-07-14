@@ -133,7 +133,12 @@ export function PlanningPage() {
       </header>
 
       <div className="overflow-hidden rounded-xl border border-border shadow-sm">
-        <PlanningNavigation institutionId={id} parentId={parentId} section={currentSection} />
+        <PlanningNavigation
+          institutionId={id}
+          parentId={parentId}
+          section={currentSection}
+          planId={currentSection === "asignaturas" ? data.gradeAlert?.plan_estudio?.id ?? null : null}
+        />
       </div>
 
       {form.notice && (

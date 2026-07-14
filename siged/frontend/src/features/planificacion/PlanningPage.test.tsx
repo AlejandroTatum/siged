@@ -77,6 +77,18 @@ describe("PlanningPage", () => {
     );
   });
 
+  it("enables navigating back to Grados from Asignaturas once the owning plan is known", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...grade, plan_estudio: { id: 7, nombre: "Plan 2026" } }), { status: 200 }));
+    renderPage("/instituciones/1/planificacion/asignaturas?grado=8");
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Grados" })).toHaveAttribute(
+        "href", "/instituciones/1/planificacion/grados?plan=7",
+      );
+    });
+  });
+
   it("creates a plan and reloads the list", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(new Response(JSON.stringify(page([])), { status: 200 }))
