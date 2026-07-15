@@ -86,9 +86,15 @@ class InstitucionSerializer(serializers.ModelSerializer):
         return self._validate_unique("nombre", value, "institución con este nombre ya existe.")
 
     def validate_codigo(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Este campo no puede estar en blanco.")
         return self._validate_unique("codigo", value, "institución con este código ya existe.")
 
     def validate_ruc(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Este campo no puede estar en blanco.")
         return self._validate_unique("ruc", value, "institución con este ruc ya existe.")
 
     def _validate_unique(self, field, value, message):

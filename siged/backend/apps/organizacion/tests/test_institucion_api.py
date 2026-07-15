@@ -113,6 +113,28 @@ def test_create_patch_validation_and_exact_basic_payload(admin_client):
 
 
 @pytest.mark.django_db
+def test_create_rejects_whitespace_only_codigo_and_ruc_and_trims_valid_values(admin_client):
+    blank_codigo = admin_client.post(
+        "/api/instituciones/", {"codigo": "   ", "nombre": "Whitespace Codigo", "ruc": "555"}
+    )
+    assert blank_codigo.status_code == 400
+    assert blank_codigo.data == {"codigo": ["Este campo no puede estar en blanco."]}
+
+    blank_ruc = admin_client.post(
+        "/api/instituciones/", {"codigo": "WS-01", "nombre": "Whitespace Ruc", "ruc": "   "}
+    )
+    assert blank_ruc.status_code == 400
+    assert blank_ruc.data == {"ruc": ["Este campo no puede estar en blanco."]}
+
+    created = admin_client.post(
+        "/api/instituciones/", {"codigo": " WS-02 ", "nombre": "Trimmed Fields", "ruc": " 556 "}
+    )
+    assert created.status_code == 201
+    assert created.data["codigo"] == "WS-02"
+    assert created.data["ruc"] == "556"
+
+
+@pytest.mark.django_db
 def test_patch_requires_an_explicit_institution_code_and_keeps_code_present_updates(admin_client):
     institution = Institucion.objects.create(nombre="Central", codigo="C1", ruc="1")
     detail = f"/api/instituciones/{institution.id}/"
