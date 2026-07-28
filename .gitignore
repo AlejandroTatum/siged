@@ -28,3 +28,6 @@ build/
 .idea/
 # Local Pi runtime state
 .atl/
+
+# Frontend coverage output
+siged/frontend/coverage/
