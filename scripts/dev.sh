@@ -70,6 +70,7 @@ print_step "Preparing backend database"
   cd "$BACKEND_DIR"
   .venv/bin/python manage.py migrate --noinput
   .venv/bin/python manage.py seed_superuser
+  .venv/bin/python manage.py seed_demo
 )
 
 print_step "Starting backend on http://$BACKEND_HOST:$BACKEND_PORT"

@@ -32,7 +32,13 @@ from apps.core.management.commands.seed_demo import (
 from apps.core.servicios.autenticacion_servicio import (
     AutenticacionServicio,
 )
-from apps.organizacion.models import Institucion, Rol, UsuarioRol
+from apps.organizacion.models import (
+    GradoEscolar,
+    Institucion,
+    PlanEstudio,
+    Rol,
+    UsuarioRol,
+)
 
 Usuario = get_user_model()
 
@@ -192,6 +198,26 @@ class SeedDemoCommandTestCase(TestCase):
                 )
             ),
             codes,
+        )
+
+    @override_settings(DEBUG=True)
+    def test_reutiliza_el_plan_activo_aunque_haya_sido_renombrado(self):
+        call_command("seed_demo")
+
+        institucion = Institucion.objects.get(codigo=DEMO_INSTITUTIONS[0][0])
+        plan = PlanEstudio.objects.get(institucion=institucion)
+        plan.nombre = "Plan de Estudio 2026-2028"
+        plan.save(update_fields=["nombre"])
+        grados_antes = GradoEscolar.objects.filter(plan_estudio=plan).count()
+
+        call_command("seed_demo")
+
+        self.assertEqual(PlanEstudio.objects.filter(institucion=institucion).count(), 1)
+        plan.refresh_from_db()
+        self.assertEqual(plan.nombre, "Plan de Estudio 2026-2028")
+        self.assertTrue(plan.es_activo)
+        self.assertEqual(
+            GradoEscolar.objects.filter(plan_estudio=plan).count(), grados_antes
         )
 
     @override_settings(DEBUG=True)

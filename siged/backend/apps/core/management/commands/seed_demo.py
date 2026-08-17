@@ -3,7 +3,16 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from apps.organizacion.models import Institucion, Rol, UsuarioRol
+from apps.organizacion.models import (
+    Asignatura,
+    EducacionNivel,
+    EducacionSubnivel,
+    GradoEscolar,
+    Institucion,
+    PlanEstudio,
+    Rol,
+    UsuarioRol,
+)
 from apps.organizacion.servicios.institucion_servicio import InstitucionServicio
 
 
@@ -18,6 +27,32 @@ DEMO_INSTITUTIONS = (
     ("INST-DEMO-001", "Unidad Educativa Río Verde", "1190001001001"),
     ("INST-DEMO-002", "Colegio Técnico Loja Norte", "1190001002001"),
     ("INST-DEMO-003", "Escuela Comunitaria Vilcabamba", "1190001003001"),
+)
+
+DEMO_NIVEL = "Educación General Básica"
+DEMO_PLAN = "Plan de Estudio 2026-2027"
+# Weekly load adds up to the "Básica Elemental" minimum, so this grado shows no RF-017 alert.
+ASIGNATURAS_ELEMENTAL = (
+    ("Lengua y Literatura", 10),
+    ("Matemática", 8),
+    ("Educación Física", 5),
+    ("Ciencias Naturales", 3),
+    ("Estudios Sociales", 3),
+    ("Educación Cultural y Artística", 3),
+    ("Lengua Extranjera", 3),
+)
+# Deliberately below the "Básica Superior" minimum, so this grado does raise the RF-017 alert.
+ASIGNATURAS_SUPERIOR = (
+    ("Lengua y Literatura", 6),
+    ("Matemática", 6),
+    ("Ciencias Naturales", 4),
+    ("Estudios Sociales", 4),
+)
+DEMO_GRADOS = (
+    ("1ro de Básica", 1, "Preparatoria", ()),
+    ("2do de Básica", 2, "Básica Elemental", ()),
+    ("4to de Básica", 4, "Básica Elemental", ASIGNATURAS_ELEMENTAL),
+    ("8vo de Básica", 8, "Básica Superior", ASIGNATURAS_SUPERIOR),
 )
 
 
@@ -79,11 +114,67 @@ class Command(BaseCommand):
             )
             assignments_created += int(created)
 
+        plan, grados_created, asignaturas_created = self._seed_planificacion(institutions[0])
+
         self.stdout.write(self.style.SUCCESS(
             f"Demo lista: usuarios {users_created} creados/{len(DEMO_USERS) - users_created} reutilizados; "
             f"instituciones {institutions_created} creadas/{len(DEMO_INSTITUTIONS) - institutions_created} reutilizadas; "
             f"asignaciones {assignments_created} creadas/{len(assignments) - assignments_created} reutilizadas."
         ))
+        self.stdout.write(self.style.SUCCESS(
+            f"Planificación lista: plan '{plan.nombre}' en {institutions[0].nombre}; "
+            f"grados {grados_created} creados/{len(DEMO_GRADOS) - grados_created} reutilizados; "
+            f"asignaturas {asignaturas_created} creadas."
+        ))
         self.stdout.write(f"Contraseña común para usuarios demo nuevos: {DEMO_PASSWORD}")
         for identification, first_name, last_name, role_name in DEMO_USERS:
             self.stdout.write(f"- {identification}: {first_name} {last_name} ({role_name})")
+
+    def _seed_planificacion(self, institucion):
+        try:
+            nivel = EducacionNivel.objects.get(nombre=DEMO_NIVEL)
+        except EducacionNivel.DoesNotExist:
+            raise CommandError(
+                f"No se encontró el nivel educativo '{DEMO_NIVEL}'. "
+                "Ejecute las migraciones para cargar el catálogo educativo."
+            )
+
+        # The institution allows a single active plan, so an existing one is reused even if it
+        # was renamed from the UI. Creating another active plan would break that constraint.
+        plan = (
+            PlanEstudio.objects.filter(institucion=institucion, nombre=DEMO_PLAN).first()
+            or PlanEstudio.objects.filter(institucion=institucion, es_activo=True).first()
+        )
+        if plan is None:
+            plan = PlanEstudio.objects.create(
+                institucion=institucion, nombre=DEMO_PLAN, es_activo=True
+            )
+
+        grados_created = asignaturas_created = 0
+        for nombre, orden, subnivel_nombre, asignaturas in DEMO_GRADOS:
+            try:
+                subnivel = EducacionSubnivel.objects.get(
+                    educacion_nivel=nivel, nombre=subnivel_nombre
+                )
+            except EducacionSubnivel.DoesNotExist:
+                raise CommandError(
+                    f"No se encontró el subnivel educativo '{subnivel_nombre}'. "
+                    "Ejecute las migraciones para cargar el catálogo educativo."
+                )
+
+            grado, created = GradoEscolar.objects.get_or_create(
+                plan_estudio=plan,
+                nombre=nombre,
+                defaults={"orden": orden, "nivel": nivel, "subnivel": subnivel},
+            )
+            grados_created += int(created)
+
+            for asignatura_nombre, pp_semana_minimo in asignaturas:
+                _, created = Asignatura.objects.get_or_create(
+                    grado_escolar=grado,
+                    nombre=asignatura_nombre,
+                    defaults={"pp_semana_minimo": pp_semana_minimo},
+                )
+                asignaturas_created += int(created)
+
+        return plan, grados_created, asignaturas_created
