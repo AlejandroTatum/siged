@@ -22,8 +22,9 @@ def institucion():
 
 @pytest.fixture
 def nivel():
+    # Test-scoped name: the seeded catalog owns the real curriculum names.
     return EducacionNivel.objects.create(
-        nombre="Educación General Básica", pp_minutos=40, pp_semana_minimo=30
+        nombre="Nivel Educativo de Prueba", pp_minutos=40, pp_semana_minimo=30
     )
 
 
