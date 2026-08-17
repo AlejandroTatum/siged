@@ -31,3 +31,6 @@ build/
 
 # Frontend coverage output
 siged/frontend/coverage/
+
+# CodeGraph index — machine-local, per-worktree, regenerable.
+.codegraph/
